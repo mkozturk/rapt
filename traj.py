@@ -5,14 +5,14 @@ import rapt.utils as ru
 from rapt import c, params
 
 class Particle:
-    def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None):
+    def __init__(self, pos=None, vel=None, t0=0, mass=None, charge=None, field=None):
         self.pos = pos  # initial position array
         self.vel = vel  # initial velocity array
         self.tcur = t0    # current time
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
         self.field = field  # magnetic field function, taking position array and returning field array
-        if all((pos,vel,t0)): # if initial state is given explicitly
+        if not (pos == None or vel == None): # if initial state is given explicitly
             self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
             self.trajectory = np.reshape(self.trajectory, (1,7))
             
@@ -108,7 +108,7 @@ class GuidingCenter:
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
         self.field = field  # magnetic field function, taking position array and returning field array
-        if all((pos,vpar,speed,t0)): # if initial state is given explicitly
+        if not (pos==None or vpar==None or speed==None or t0==None): # if initial state is given explicitly
             self.mu = ru.magnetic_moment(self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([t0], pos, [vpar]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
