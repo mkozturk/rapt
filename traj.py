@@ -31,7 +31,7 @@ class Particle:
             self.charge = p.charge
             self.field = p.field
             self.tcur = p.trajectory[-1,0]
-            self.pos, self.vp, self.v = ru.GCtoFP(p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge)
+            self.pos, self.vel = ru.GCtoFP(p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge)
             self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
             self.trajectory = np.reshape(self.trajectory, (1,7))
         else:
@@ -44,7 +44,7 @@ class Particle:
         # set resolution of cyclotron motion
         res = ru.cyclotron_period(pos, vel, self.field, self.mass, self.charge) / params['cyclotronresolution']
         
-        # gamma should be evaluated inside deriv() if speed changes along the trajectory (e.g. due to electric fields)        
+        # gamma should be evaluated inside deriv() if the speed changes along the trajectory (e.g. due to electric fields)        
         gamma = 1.0/np.sqrt(1 - np.dot(vel, vel) / c**2)
      
         def deriv(Y, t=0):
@@ -55,7 +55,8 @@ class Particle:
             return out
         
         times = np.arange(self.tcur, self.tcur+delta, res)
-        traj = odeint(deriv, self.trajectory[-1,:], times, rtol=1e-10, atol=1e-10)
+        rtol, atol = params["solvertolerances"]
+        traj = odeint(deriv, self.trajectory[-1,:], times, rtol=rtol, atol=atol)
         self.trajectory = np.concatenate((self.trajectory, traj[1:,:]))
         self.tcur = self.trajectory[-1,0]
     
@@ -156,7 +157,8 @@ class GuidingCenter:
             )
             )
         times = np.arange(self.tcur, self.tcur+delta, dt)
-        traj = odeint(deriv, self.trajectory[-1,:], times, rtol=1e-10, atol=1e-10)
+        rtol, atol = params["solvertolerances"]
+        traj = odeint(deriv, self.trajectory[-1,:], times, rtol=rtol, atol=atol)
         self.trajectory = np.concatenate((self.trajectory, traj[1:,:]))
         self.tcur = self.trajectory[-1,0]
     def gett(self):

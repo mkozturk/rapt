@@ -11,7 +11,8 @@ Re = 6378137 # meter (Earth radius)
 params = {
     "cyclotronresolution": 10,
     "GCtimestep": 0.01,
-    "gradientstepsize": 0.00001*Re
+    "gradientstepsize": 0.00001*Re,
+    "solvertolerances":(None, None) # rtol,atol values for scipy.integrate.odeint
 }
 
 #from imp import reload
