@@ -20,4 +20,4 @@ params = {
 #rapt.fields = reload(rapt.fields)
 from rapt import utils
 from rapt import fields
-from rapt.traj import Particle
+from rapt.traj import Particle, GuidingCenter
