@@ -2,13 +2,19 @@ import numpy as np
 from numpy.linalg import norm
 from rapt import c,e,params
 
-def test():
-    return c,e,params
+__M = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,-1, 0,-1, 0, 0, 1, 0],
+                [0, 0, 1, 0, 0,-1, 0, 0, 0, 0, 0, 0,-1, 0, 0, 1, 0, 0],
+                [0, 1, 0, 0,-1, 0,-1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+                ]) # for the curl calculation with central differences
     
 def B(pos, field):
     """Strength of magnetic field at position pos."""
     Bvec = field(pos)
-    return np.sqrt(np.dot(Bvec, Bvec)) 
+    return np.sqrt(np.dot(Bvec, Bvec))
+
+def unitb(pos, field):
+    Bvec = field(pos)
+    return Bvec / np.sqrt(np.dot(Bvec, Bvec))
 
 def gradB(pos, field):
     """Returns the gradient of field strength at position pos."""
@@ -18,10 +24,19 @@ def gradB(pos, field):
             (B((x,y+d,z), field) - B((x,y-d,z), field))/(2*d),
             (B((x,y,z+d), field) - B((x,y,z-d), field))/(2*d)]
 
-def curlb(x,y,z, field):
+def curlb(pos, field):
     """Returns the curl of the field direction vector."""
     d=params["gradientstepsize"]
-    pass
+    pos = np.array(pos)
+    beta = np.concatenate((
+        unitb(pos + (d,0,0), field),
+        unitb(pos - (d,0,0), field),
+        unitb(pos + (0,d,0), field),
+        unitb(pos - (0,d,0), field),
+        unitb(pos + (0,0,d), field),
+        unitb(pos - (0,0,d), field)
+        ))
+    return np.dot(__M, beta) / (2*d)
     
 def cyclotron_period(pos, vel, field, mass, charge):
     """Returns the period of the cyclotron motion of a particle."""

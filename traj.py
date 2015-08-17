@@ -99,6 +99,12 @@ class Particle:
             rgc, vp, spd = ru.GuidingCenter(r, v, self.field, self.mass, self.charge)
             out.append(ru.magnetic_moment(rgc, vp, spd, self.field, self.mass))
         return np.array(out)
+    def cycrad(self):
+        """The current cyclotron radius."""
+        return ru.cyclotron_radius(self.trajectory[-1, 1:4], self.trajectory[-1, 4:], self.field, self.mass, self.charge)
+    def cycper(self):
+        """The current cyclotron period."""
+        return ru.cyclotron_period(self.trajectory[-1, 1:4], self.trajectory[-1, 4:], self.field, self.mass, self.charge)
 
 class GuidingCenter:
     def __init__(self, pos=None, vpar=None, speed=None, t0=None, mass=None, charge=None, field=None):
@@ -139,6 +145,9 @@ class GuidingCenter:
             raise(ValueError, "Particle or GuidingCenter objects required.")
 
     def advance(self, delta):
+        self.NorthropTellerAdvance(delta)
+    
+    def NorthropTellerAdvance(self, delta):
         """Advance the GC position and parallel speed for time 'delta' starting at the current time, position, parallel speed."""
         dt = params["GCtimestep"]
         gamma = 1.0/np.sqrt(1 - (self.v/c)**2)
@@ -161,6 +170,32 @@ class GuidingCenter:
         traj = odeint(deriv, self.trajectory[-1,:], times, rtol=rtol, atol=atol)
         self.trajectory = np.concatenate((self.trajectory, traj[1:,:]))
         self.tcur = self.trajectory[-1,0]
+    
+    def BrizardChanAdvance(self, delta):
+        dt = params["GCtimestep"]
+        gamma = 1.0/np.sqrt(1 - (self.v/c)**2)
+
+        def deriv(Y, t=0):
+            B = self.field(Y[1:4])
+            Bmag = np.sqrt(np.dot(B,B))
+            unitb = B / Bmag
+            gB = ru.gradB(Y[1:4], self.field)
+            cb = ru.curlb(Y[1:4], self.field)
+            Bstar = B + gamma * self.mass * Y[4] * cb / self.charge
+            Bstarpar = np.dot(B,Bstar) / Bmag
+            retval = np.ones(5) 
+            retval[1:4] = (Y[4] * Bstar  + self.mu * np.cross(unitb, gB) / (self.charge * gamma) ) / Bstarpar
+            retval[4] = -self.mu * np.dot(Bstar, gB) / (self.mass * gamma*gamma * Bstarpar)
+            return retval
+        
+        times = np.arange(self.tcur, self.tcur+delta, dt)
+        rtol, atol = params["solvertolerances"]
+        traj = odeint(deriv, self.trajectory[-1,:], times, rtol=rtol, atol=atol)
+        self.trajectory = np.concatenate((self.trajectory, traj[1:,:]))
+        self.tcur = self.trajectory[-1,0]
+        
+        
+        
     def gett(self):
         return self.trajectory[:,0]
     def getx(self):
