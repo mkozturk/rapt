@@ -5,7 +5,7 @@ Created on Wed Aug  5 15:36:48 2015
 @author: kaan
 """
 
-# Follow a 1MeV proton under the dipolar field of the Earth.
+# Follow a proton under the dipolar field of the Earth.
 
 from rapt import m_pr, e, Re, params
 from rapt.traj import Particle, GuidingCenter

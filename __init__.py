@@ -10,14 +10,11 @@ Re = 6378137 # meter (Earth radius)
 
 params = {
     "cyclotronresolution": 10,
-    "GCtimestep": 0.01,
+    "GCtimestep": 1,
     "gradientstepsize": 0.00001*Re,
     "solvertolerances":(None, None) # rtol,atol values for scipy.integrate.odeint
 }
 
-#from imp import reload
-#rapt.utils = reload(rapt.utils)
-#rapt.fields = reload(rapt.fields)
 from rapt import utils
 from rapt import fields
 from rapt.traj import Particle, GuidingCenter

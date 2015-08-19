@@ -145,7 +145,7 @@ class GuidingCenter:
             raise(ValueError, "Particle or GuidingCenter objects required.")
 
     def advance(self, delta):
-        self.NorthropTellerAdvance(delta)
+        self.BrizardChanAdvance(delta)
     
     def NorthropTellerAdvance(self, delta):
         """Advance the GC position and parallel speed for time 'delta' starting at the current time, position, parallel speed."""
@@ -193,8 +193,6 @@ class GuidingCenter:
         traj = odeint(deriv, self.trajectory[-1,:], times, rtol=rtol, atol=atol)
         self.trajectory = np.concatenate((self.trajectory, traj[1:,:]))
         self.tcur = self.trajectory[-1,0]
-        
-        
         
     def gett(self):
         return self.trajectory[:,0]

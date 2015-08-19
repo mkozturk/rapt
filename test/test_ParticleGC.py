@@ -5,7 +5,7 @@ Created on Wed Aug  5 15:36:48 2015
 @author: kaan
 """
 
-# Follow a 100keV proton under the dipolar field of the Earth.
+# Follow a proton under the dipolar field of the Earth.
 
 from rapt import m_pr, e, Re, Particle, params
 from rapt.traj import GuidingCenter
@@ -35,8 +35,8 @@ p = Particle()
 p.init(g)
 
 # Follow the particle and the guiding center for 1000s, store result internally
-g.advance(100)
-p.advance(100)
+g.advance(500)
+p.advance(500)
 # Plot the z coordinate vs. time
 pl.figure()
 pl.plot( g.gett(), g.getz()/Re, p.gett(), p.getz()/Re )

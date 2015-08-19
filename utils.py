@@ -3,7 +3,7 @@ from numpy.linalg import norm
 from rapt import c,e,params
 
 __M = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,-1, 0,-1, 0, 0, 1, 0],
-                [0, 0, 1, 0, 0,-1, 0, 0, 0, 0, 0, 0,-1, 0, 0, 1, 0, 0],
+                [0, 0,-1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,-1, 0, 0],
                 [0, 1, 0, 0,-1, 0,-1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
                 ]) # for the curl calculation with central differences
     
