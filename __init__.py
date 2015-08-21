@@ -6,13 +6,13 @@ c = 299792458 # speed of light (m/s)
 B0 = 3.07e-5 # Tesla (Earth field strength at magnetic equator)
 Re = 6378137 # meter (Earth radius)
 
-# Parameters
+# Parameters and defaults
 
 params = {
     "cyclotronresolution": 10,
     "GCtimestep": 1,
     "gradientstepsize": 0.00001*Re,
-    "solvertolerances":(None, None) # rtol,atol values for scipy.integrate.odeint
+    "solvertolerances":(None, None), # rtol,atol values for scipy.integrate.odeint
 }
 
 from rapt import utils

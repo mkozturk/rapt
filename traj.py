@@ -16,7 +16,7 @@ class Particle:
             self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
             self.trajectory = np.reshape(self.trajectory, (1,7))
             
-    def init(self, p):  # Initialization with another Particle or GuidingCenter instance
+    def init(self, p, gyrophase=0):  # Initialization with another Particle or GuidingCenter instance
         if isinstance(p, Particle):
             self.mass = p.mass
             self.charge = p.charge
@@ -31,7 +31,7 @@ class Particle:
             self.charge = p.charge
             self.field = p.field
             self.tcur = p.trajectory[-1,0]
-            self.pos, self.vel = ru.GCtoFP(p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge)
+            self.pos, self.vel = ru.GCtoFP(p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge, gyrophase)
             self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
             self.trajectory = np.reshape(self.trajectory, (1,7))
         else:
@@ -107,7 +107,7 @@ class Particle:
         return ru.cyclotron_period(self.trajectory[-1, 1:4], self.trajectory[-1, 4:], self.field, self.mass, self.charge)
 
 class GuidingCenter:
-    def __init__(self, pos=None, vpar=None, speed=None, t0=None, mass=None, charge=None, field=None):
+    def __init__(self, pos=None, vpar=None, speed=None, t0=None, mass=None, charge=None, field=None, eq='northropteller'):
         self.pos = pos  # initial position array
         self.vp = vpar  # initial parallel speed
         self.v = speed    # speed of the particle
@@ -115,6 +115,7 @@ class GuidingCenter:
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
         self.field = field  # magnetic field function, taking position array and returning field array
+        self.eq = eq     # Equation to solve. 'northropteller' or 'brizardchan'
         if not (pos==None or vpar==None or speed==None or t0==None): # if initial state is given explicitly
             self.mu = ru.magnetic_moment(self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([t0], pos, [vpar]))
@@ -129,6 +130,7 @@ class GuidingCenter:
             self.mass = p.mass
             self.charge = p.charge
             self.field = p.field
+            self.eq = p.eq
             self.mu = ru.magnetic_moment(self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([self.tcur], self.pos, [self.vp]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
@@ -145,7 +147,10 @@ class GuidingCenter:
             raise(ValueError, "Particle or GuidingCenter objects required.")
 
     def advance(self, delta):
-        self.BrizardChanAdvance(delta)
+        if self.eq == "northropteller":
+            self.NorthropTellerAdvance(delta)
+        elif self.eq == "brizardchan":
+            self.BrizardChanAdvance(delta)
     
     def NorthropTellerAdvance(self, delta):
         """Advance the GC position and parallel speed for time 'delta' starting at the current time, position, parallel speed."""
