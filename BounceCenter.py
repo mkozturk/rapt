@@ -34,6 +34,8 @@ class BounceCenter:
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
         self.field = field  # the field object
+        if not field.isstatic:
+            raise RuntimeError("BounceCenter does not work with nonstatic fields or electric fields.")
         self.pa = pa/180*np.pi  # The initial pitch angle
 #        self.vd = bounce_av_vel_p(np.concatenate([[t0],pos]), field, pa, speed)
 #        self.vd = np.sqrt(np.dot(self.vd, self.vd))

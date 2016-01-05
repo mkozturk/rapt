@@ -13,7 +13,7 @@ class Field:
     def __init__(self):
         self.gradientstepsize = 1e-6  # step size to evaluate spatial derivatives with central differences
         self.timederivstepsize = 1e-3 # step size to evaluate time derivatives with central differences
-        self.static = True # whether the field varies in time
+        self.isstatic = True # whether the field varies in time
 
     def B(self, tpos):
         # tpos : 4-element array of time, x, y, z
@@ -75,7 +75,10 @@ class Field:
     
     def timescale(self, tpos):
         """Returns B / d|B|/dt, the time scale of the change of the magnetic field strength."""
-        return self.magB(tpos) / self.dBdt(tpos)
+        if self.isstatic:
+            return None
+        else:
+            return self.magB(tpos) / self.dBdt(tpos)
     
 class EarthDipole(Field):
     coeff = -3*B0*Re**3
@@ -110,6 +113,7 @@ class UniformBz(Field):
 
 class UniformCrossedEB(UniformBz):
     def __init__(self, Ey=1, Bz=1):
+        self.isstatic = False
         self.Ey = Ey
         self.Bz = Bz
     def E(self,tpos):
@@ -121,6 +125,7 @@ class VarEarthDipole(Field):
     def __init__(self,amp=0.1,period=10):
         Field.__init__(self)
         self.gradientstepsize = Re/1000
+        self.isstatic = False
         self.amp = amp
         self.period = period
     def B(self,tpos):
