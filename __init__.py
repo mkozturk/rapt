@@ -10,11 +10,17 @@ Re = 6378137 # meter (Earth radius)
 
 params = {
     "cyclotronresolution": 10,
-    "GCtimestep": 1,
-    "gradientstepsize": 0.00001*Re,
+    "GCtimestep": 0.5,
+    "BCtimestep": 0.1, # bounce center time step, in units of bounce period.
     "solvertolerances":(None, None), # rtol,atol values for scipy.integrate.odeint
+    "fieldlineresolution": 50, # field line sampling size = length scale divided by this number
+    "flsolver": "rkf", # 'rkf' or 'odeint'
+    "eyegradientstep": 0.03*Re,
+    "epss": 1e-2,     # spatial adiabaticity threshold
+    "epst": 1e-2     # temporal adiabaticity threshold
 }
 
-from rapt import utils
-from rapt import fields
-from rapt.traj import Particle, GuidingCenter
+from rapt import utils, fields, fieldline, rkf
+from rapt.traj import Particle, GuidingCenter, Adaptive
+from rapt.BounceCenter import BounceCenter
+from rapt.flutils import eye, gradI, halfbouncepath
