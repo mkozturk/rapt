@@ -3,28 +3,25 @@ from scipy.optimize import newton,brentq
 from scipy.integrate import quad
 from rapt import c,e,B0,Re,params
 
-# In all of the following, _field_ is a function that takes an array [t,x,y,z]
-# and returns the magnetic field vector array at that time and cartesian location.
-
 def cyclotron_period(t, pos, vel, field, mass, charge):
     """Returns the period of the cyclotron motion of a particle."""
     # Use with Particle.
     gamma = 1.0/np.sqrt(1 - np.dot(vel,vel)/c**2)
-    B = field(np.concatenate([[t], pos]))
-    return 2*np.pi*gamma*mass/(abs(charge)*np.sqrt(np.dot(B,B)))
+    B = field.magB(np.concatenate([[t], pos]))
+    return 2*np.pi*gamma*mass*B/abs(charge)
 
 def cyclotron_period2(t, pos, speed, field, mass, charge):
     """Returns the period of the cyclotron motion of a particle."""
     # Use with GuidingCenter.
     gamma = 1.0/np.sqrt(1 - (speed/c)**2)
-    B = field(np.concatenate([[t], pos]))
-    return 2*np.pi*gamma*mass/(abs(charge)*np.sqrt(np.dot(B,B)))
+    B = field.magB(np.concatenate([[t], pos]))
+    return 2*np.pi*gamma*mass*B/abs(charge)
 
 def cyclotron_radius(t, pos,vel,field,mass,charge):
     """Returns the period of a particle at given position and velocity."""
     vsq = np.dot(vel, vel)
     gamma = 1.0/np.sqrt(1 - vsq/c**2)
-    B = field(np.concatenate([[t], pos]))
+    B = field.B(np.concatenate([[t], pos]))
     Bmag = np.sqrt(np.dot(B,B))
     vpar = np.dot(vel,B)/Bmag
     vperp = np.sqrt(vsq-vpar**2)
@@ -33,7 +30,7 @@ def cyclotron_radius(t, pos,vel,field,mass,charge):
 def cyclotron_radius2(t, pos, vpar, v, field, mass, charge):
     """Returns the period of a particle at given position, parallel speed, and total speed."""
     gamma = 1.0/np.sqrt(1 - (v/c)**2)
-    B = field(np.concatenate([[t], pos]))
+    B = field.B(np.concatenate([[t], pos]))
     Bmag = np.sqrt(np.dot(B,B))
     vperp = np.sqrt((v-vpar)*(v+vpar))
     return gamma*mass*vperp/(abs(charge)*Bmag)
@@ -41,8 +38,7 @@ def cyclotron_radius2(t, pos, vpar, v, field, mass, charge):
 def magnetic_moment(t, pos, vpar, v, field, mass):
     """Returns the magnetic moment of the given guiding center."""
     gamma = 1.0/np.sqrt(1 - (v/c)**2)
-    B = field(np.concatenate([[t], pos]))
-    Bmag = np.sqrt(np.dot(B,B))
+    Bmag = field.magB(np.concatenate([[t], pos]))
     return gamma**2*mass*(v-vpar)*(v+vpar)/(2*Bmag) # magnetic moment
 
 def speedfromKE(KE, mass, unit="ev"):
@@ -55,13 +51,13 @@ def speedfromKE(KE, mass, unit="ev"):
     else:  # relativistic
         return c * np.sqrt(1-(mc2/(mc2+KE))**2)
 
-def GuidingCenter(t, r, v, field, mass, charge, tol=1e-3, maxiter=20, debug=False):
+def guidingcenter(t, r, v, field, mass, charge, tol=1e-3, maxiter=20, debug=False):
     """Returns the guiding center for the given particle.""" 
 
     def gyrovector(r):
         vsq = np.dot(v,v)
         gamma = 1/np.sqrt(1-vsq/c**2)
-        B = field(np.concatenate([[t], r]))
+        B = field.B(np.concatenate([[t], r]))
         Bsq = np.dot(B,B)
         return gamma*mass/(abs(charge)*Bsq) * np.cross(B,v)
         
@@ -81,7 +77,7 @@ def GuidingCenter(t, r, v, field, mass, charge, tol=1e-3, maxiter=20, debug=Fals
             if debug:
                 return GC_list
             else:
-                B = field(np.concatenate([[t], GC]))
+                B = field.B(np.concatenate([[t], GC]))
                 vp = np.dot(v,B)/norm(B)
                 return GC, vp, norm(v)
         GC_old = GC
@@ -111,7 +107,7 @@ def GCtoFP(t, R, vp, speed, field, mass, charge, gyrophase):
         cc = -1.0 * (v[0] + v[1]) / v[2]
         return np.array([1, 1, cc])/np.sqrt(2+cc**2)
 
-    B = field(np.concatenate([[t], R]))
+    B = field.B(np.concatenate([[t], R]))
     Bsq = np.dot(B,B)
     b = B / np.sqrt(Bsq)  # unit vector in the field direction
     pa = np.arccos(vp/speed)  # pitch angle

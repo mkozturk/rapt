@@ -39,7 +39,7 @@ class BounceCenter:
 #        self.vd = np.sqrt(np.dot(self.vd, self.vd))
         self.fcalls = 0  # for debugging
         self.vectors = []  # for debugging. Holds the vectors returned by deriv() at each call.
-        self.mu = ru.magnetic_moment(t0, pos, speed*np.cos(self.pa), speed, field.B, mass) # the first invariant value (constant)
+        self.mu = ru.magnetic_moment(t0, pos, speed*np.cos(self.pa), speed, field, mass) # the first invariant value (constant)
         assert self.mu>0
         if not (pos==None or speed==None or t0==None): # if initial state is given explicitly
             self.trajectory = np.concatenate(([t0], pos))

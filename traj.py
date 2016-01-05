@@ -31,7 +31,7 @@ class Particle:
             self.charge = p.charge
             self.field = p.field
             self.tcur = p.trajectory[-1,0]
-            self.pos, self.vel = ru.GCtoFP(self.tcur, p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field.B, self.mass, self.charge, gyrophase)
+            self.pos, self.vel = ru.GCtoFP(self.tcur, p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge, gyrophase)
             self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
             self.trajectory = np.reshape(self.trajectory, (1,7))
         else:
@@ -43,7 +43,7 @@ class Particle:
         pos = self.trajectory[-1,1:4]
         vel = self.trajectory[-1,4:]
         # set resolution of cyclotron motion
-        res = ru.cyclotron_period(t, pos, vel, self.field.B, self.mass, self.charge) / params['cyclotronresolution']
+        res = ru.cyclotron_period(t, pos, vel, self.field, self.mass, self.charge) / params['cyclotronresolution']
      
         def deriv(Y, t=0):
             gamma = 1.0/np.sqrt(1 - np.dot(Y[4:], Y[4:]) / c**2)
@@ -109,24 +109,24 @@ class Particle:
         out = []
         for row in self.trajectory:
             t,r,v = row[0], row[1:4], row[4:]
-            rgc, vp, spd = ru.GuidingCenter(t, r, v, self.field.B, self.mass, self.charge)
+            rgc, vp, spd = ru.guidingcenter(t, r, v, self.field, self.mass, self.charge)
             out.append(list(rgc)+[vp,spd])
         return np.array(out)
     def mu(self):
         out = []
         for row in self.trajectory:
             t, r,v = row[0], row[1:4], row[4:]
-            rgc, vp, spd = ru.GuidingCenter(t, r, v, self.field.B, self.mass, self.charge)
-            out.append(ru.magnetic_moment(t, rgc, vp, spd, self.field.B, self.mass))
+            rgc, vp, spd = ru.GuidingCenter(t, r, v, self.field, self.mass, self.charge)
+            out.append(ru.magnetic_moment(t, rgc, vp, spd, self.field, self.mass))
         return np.array(out)
     def cycrad(self):
         """The current cyclotron radius."""
         t, r, v = self.trajectory[-1, 0], self.trajectory[-1, 1:4], self.trajectory[-1, 4:]
-        return ru.cyclotron_radius(t, r, v, self.field.B, self.mass, self.charge)
+        return ru.cyclotron_radius(t, r, v, self.field, self.mass, self.charge)
     def cycper(self):
         """The current cyclotron period."""
         t, r, v = self.trajectory[-1, 0], self.trajectory[-1, 1:4], self.trajectory[-1, 4:]
-        return ru.cyclotron_period(t, r, v, self.field.B, self.mass, self.charge)
+        return ru.cyclotron_period(t, r, v, self.field, self.mass, self.charge)
 
 class GuidingCenter:
     # TO DO: Not compatible with electric fields and time-varying magnetic fields.
@@ -144,7 +144,7 @@ class GuidingCenter:
         self.field = field  # magnetic field function, taking position array and returning field array
         self.eq = eq     # Equation to solve. 'northropteller' or 'brizardchan'
         if not (pos==None or vpar==None or speed==None or t0==None): # if initial state is given explicitly
-            self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field.B, self.mass)
+            self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([t0], pos, [vpar]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
     
@@ -158,7 +158,7 @@ class GuidingCenter:
             self.charge = p.charge
             self.field = p.field
             self.eq = p.eq
-            self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field.B, self.mass)
+            self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([self.tcur], self.pos, [self.vp]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
         elif isinstance(p, Particle):
@@ -166,8 +166,8 @@ class GuidingCenter:
             self.charge = p.charge
             self.field = p.field
             self.tcur = p.trajectory[-1,0]
-            self.pos, self.vp, self.v = ru.GuidingCenter(self.tcur, p.trajectory[-1,1:4], p.trajectory[-1,4:], self.field.B, self.mass, self.charge)
-            self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field.B, self.mass)
+            self.pos, self.vp, self.v = ru.guidingcenter(self.tcur, p.trajectory[-1,1:4], p.trajectory[-1,4:], self.field, self.mass, self.charge)
+            self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([self.tcur], self.pos, [self.vp]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
         else:
@@ -272,12 +272,12 @@ class GuidingCenter:
     def cycrad(self):
         """The current cyclotron radius."""
         t, r, vp = self.trajectory[-1, 0], self.trajectory[-1, 1:4], self.trajectory[-1, 4]
-        return ru.cyclotron_radius2(t, r, vp, self.v, self.field.B, self.mass, self.charge)
+        return ru.cyclotron_radius2(t, r, vp, self.v, self.field, self.mass, self.charge)
 
     def cycper(self):
         """The current cyclotron period."""
         t, r = self.trajectory[-1, 0], self.trajectory[-1, 1:4]
-        return ru.cyclotron_period2(t, r, self.v, self.field.B, self.mass, self.charge)
+        return ru.cyclotron_period2(t, r, self.v, self.field, self.mass, self.charge)
 
     def ke(self):
         # BUG: Drift speed term not added.
