@@ -16,18 +16,19 @@ class GuidingCenter:
     #   (1) The ExB term
     #   (2) The speed as a separate variable that's updated in time.
     #       Update the kinetic energy at each step and get speed from it.
-    def __init__(self, pos=None, vpar=None, speed=None, t0=None, mass=None, charge=None, field=None, eq='brizardchan'):
+    def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None, eq='brizardchan'):
         self.pos = pos  # initial position array
-        self.vp = vpar  # initial parallel speed
-        self.v = speed    # speed of the particle
+        tpos = np.concatenate([[t0], pos])        
+        self.vp = np.dot(vel, field.B(tpos)) / field.magB(tpos)  # initial parallel speed
+        self.v = np.sqrt(np.dot(vel,vel))    # speed of the particle
         self.tcur = t0    # current time
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
-        self.field = field  # magnetic field function, taking position array and returning field array
+        self.field = field
         self.eq = eq     # Equation to solve. 'northropteller' or 'brizardchan'
-        if not (pos==None or vpar==None or speed==None or t0==None): # if initial state is given explicitly
+        if not (pos==None or vel==None or t0==None): # if initial state is given explicitly
             self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field, self.mass)
-            self.trajectory = np.concatenate(([t0], pos, [vpar]))
+            self.trajectory = np.concatenate(([t0], pos, [self.vp]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
     
     def init(self, p):  # Initialization with another Particle or GuidingCenter instance
