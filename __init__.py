@@ -21,6 +21,10 @@ params = {
 }
 
 from rapt import utils, fields, fieldline, rkf
-from rapt.traj import Particle, GuidingCenter, Adaptive
+from rapt.Particle import Particle
+from rapt.GuidingCenter import GuidingCenter
+from rapt.Adaptive import Adaptive
 from rapt.BounceCenter import BounceCenter
+from rapt.fieldline import Fieldline
+from rapt.fields import *
 from rapt.flutils import eye, gradI, halfbouncepath

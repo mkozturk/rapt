@@ -1,6 +1,6 @@
 import numpy as np
 from rapt import Re, B0
-class Field:
+class _Field:
     # A general field class.
     # Will be subclassed; not for direct use.
 
@@ -80,10 +80,10 @@ class Field:
         else:
             return self.magB(tpos) / self.dBdt(tpos)
     
-class EarthDipole(Field):
+class EarthDipole(_Field):
     coeff = -3*B0*Re**3
     def __init__(self):
-        Field.__init__(self)
+        _Field.__init__(self)
         self.gradientstepsize = Re*1e-6
     def B(self,tpos):
         t,x,y,z = tpos
@@ -91,9 +91,9 @@ class EarthDipole(Field):
         
         return self.coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
 
-class DoubleDipole(Field):
+class DoubleDipole(_Field):
     def __init__(self, standoff=10*Re, imagestrength=1):
-        Field.__init__(self)
+        _Field.__init__(self)
         self.gradientstepsize = Re/1000
         self.dd = 2*standoff  # distance between two dipoles
         self.k = imagestrength   # >=1. Relative strength of the image dipole.
@@ -104,9 +104,9 @@ class DoubleDipole(Field):
         B2 = self.k * np.array([3*x*z, 3*y*z, (2*z*z -x*x- y*y)]) / pow(x*x+y*y+z*z, 5.0/2.0)
         return (-B0*Re**3)*(B1+B2)
         
-class UniformBz(Field):
+class UniformBz(_Field):
     def __init__(self, Bz=1):
-        Field.__init__(self)
+        _Field.__init__(self)
         self.Bz = Bz
     def B(self,tpos):
         return np.array((0,0,self.Bz))
@@ -119,11 +119,11 @@ class UniformCrossedEB(UniformBz):
     def E(self,tpos):
         return np.array((0,self.Ey,0))
 
-class VarEarthDipole(Field):
+class VarEarthDipole(_Field):
     # Earth dipole.
     # Strength sinusoidally oscillating in time around the nominal value.
     def __init__(self,amp=0.1,period=10):
-        Field.__init__(self)
+        _Field.__init__(self)
         self.gradientstepsize = Re/1000
         self.isstatic = False
         self.amp = amp
@@ -132,10 +132,10 @@ class VarEarthDipole(Field):
         t,x,y,z = tpos
         return -B0*Re**3 * (1+self.amp*np.sin(2*np.pi*t/self.period)) * np.array([3*x*z, 3*y*z, (2*z*z -x*x- y*y)]) / pow(x*x+y*y+z*z, 5.0/2.0)
 
-class Parabolic(Field):
+class Parabolic(_Field):
     # A parabolic model field imitating the tail.
     def __init__(self, B0=10.0, Bn=1.0, d=0.2):
-        Field.__init__(self)
+        _Field.__init__(self)
         self.B0 = B0
         self.Bn = Bn
         self.d = d
@@ -146,9 +146,9 @@ class Parabolic(Field):
         else:
             return [np.sign(z)*B0, 0, self.Bn]
 
-class DipoleAndLinear(Field):
+class DipoleAndLinear(_Field):
     def __init__(self):
-        Field.__init__(self)
+        _Field.__init__(self)
     def B(self, tpos):
         t,x,y,z = tpos
         return B0*x/(10*Re)**4 - B0*Re**3 / pow(x*x+y*y+z*z, 5.0/2.0) * np.array([3*x*z, 3*y*z, (2*z*z -x*x- y*y)])
