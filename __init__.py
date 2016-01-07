@@ -3,8 +3,8 @@ e = 1.602176565e-19 # Elementary charge (Coulomb)
 m_pr = 1.672621777e-27 # Proton mass (kg)
 m_el = 9.10938291e-31 # Electron mass (kg)
 c = 299792458 # speed of light (m/s)
-B0 = 3.07e-5 # Tesla (Earth field strength at magnetic equator)
-Re = 6378137 # meter (Earth radius)
+B0 = 3.07e-5 # Earth field strength at magnetic equator (Tesla)
+re = Re = 6378137 # Earth radius (meter)
 
 # Parameters and defaults
 
@@ -13,7 +13,7 @@ params = {
     "GCtimestep": 0.5,
     "BCtimestep": 0.1, # bounce center time step, in units of bounce period.
     "solvertolerances":(None, None), # rtol,atol values for scipy.integrate.odeint
-     "fieldlineresolution": 50, # field line sampling size = length scale divided by this number
+    "fieldlineresolution": 50, # field line sampling size = length scale divided by this number
     "flsolver": "rkf", # 'rkf' or 'odeint'
     "eyegradientstep": 0.03*Re,
     "epss": 1e-2,     # spatial adiabaticity threshold
@@ -26,5 +26,4 @@ from rapt.GuidingCenter import GuidingCenter
 from rapt.Adaptive import Adaptive
 from rapt.BounceCenter import BounceCenter
 from rapt.fieldline import Fieldline
-from rapt.fields import *
 from rapt.flutils import eye, gradI, halfbouncepath
