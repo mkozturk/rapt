@@ -11,6 +11,7 @@ re = Re = 6378137 # Earth radius (meter)
 params = {
     "cyclotronresolution": 10,
     "GCtimestep": 0.5,
+    "GCeq": "brizardchan", # equation of the guiding center motion. "northropteller" or "brizardchan"
     "BCtimestep": 0.1, # bounce center time step, in units of bounce period.
     "solvertolerances":(None, None), # rtol,atol values for scipy.integrate.odeint
     "fieldlineresolution": 50, # field line sampling size = length scale divided by this number

@@ -16,7 +16,7 @@ class GuidingCenter:
     #   (1) The ExB term
     #   (2) The speed as a separate variable that's updated in time.
     #       Update the kinetic energy at each step and get speed from it.
-    def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None, eq='brizardchan'):
+    def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None):
         self.pos = pos  # initial position array
         tpos = np.concatenate([[t0], pos])        
         self.vp = np.dot(vel, field.B(tpos)) / field.magB(tpos)  # initial parallel speed
@@ -25,7 +25,6 @@ class GuidingCenter:
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
         self.field = field
-        self.eq = eq     # Equation to solve. 'northropteller' or 'brizardchan'
         if not (pos==None or vel==None or t0==None): # if initial state is given explicitly
             self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([t0], pos, [self.vp]))
@@ -74,11 +73,13 @@ class GuidingCenter:
             and self.cycper() / self.field.timescale(self.trajectory[-1,:4]) < eps_t
     
     def advance(self, delta):
-        if self.eq == "northropteller":
+        if params["GCeq"] == "northropteller":
             self.NorthropTellerAdvance(delta)
-        elif self.eq == "brizardchan":
+        elif params["GCeq"] == "brizardchan":
             self.BrizardChanAdvance(delta)
-    
+        else:
+            raise Exception("Guiding-center equation "+params["GCeq"]+" not implemented.")
+        
     def NorthropTellerAdvance(self, delta):
         """Advance the GC position and parallel speed for time 'delta' starting at the current time, position, parallel speed."""
         dt = params["GCtimestep"]
