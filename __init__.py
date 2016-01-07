@@ -13,7 +13,7 @@ params = {
     "GCtimestep": 0.5,
     "BCtimestep": 0.1, # bounce center time step, in units of bounce period.
     "solvertolerances":(None, None), # rtol,atol values for scipy.integrate.odeint
-    "fieldlineresolution": 50, # field line sampling size = length scale divided by this number
+     "fieldlineresolution": 50, # field line sampling size = length scale divided by this number
     "flsolver": "rkf", # 'rkf' or 'odeint'
     "eyegradientstep": 0.03*Re,
     "epss": 1e-2,     # spatial adiabaticity threshold
