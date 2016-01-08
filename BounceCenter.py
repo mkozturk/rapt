@@ -15,6 +15,7 @@ class BounceCenter:
     def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None):
         self.pos = pos  # initial position array
         self.v = np.sqrt(np.dot(vel,vel))    # speed of the particle
+        self.t0 = t0
         self.tcur = t0     # current time
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
@@ -33,9 +34,27 @@ class BounceCenter:
             self.trajectory = np.reshape(self.trajectory, (1,4))
 
     def setpa(self, pa):
-        """Orients the velocity vector such that the angle between velocity and field vectors is pa degrees."""
-        self.pa = pa * np.pi / 180  # convert to radians
-        self.mu = ru.magnetic_moment(self.trajectory[0], self.trajectory[1:4], self.v*np.cos(self.pa), self.v, self.field, self.mass)
+        """Resets the velocity vector so that the pitch angle is pa degrees. Reinitializes the object."""
+        field = self.field
+        tpos = self.trajectory[-1,0:4]
+        v = self.trajectory[-1,4:] # velocity
+        
+        # Construct a vector that has the same length as v,
+        # lies on the plane spanned by v and B,
+        # and makes an angle of pa with B.
+        
+        # the unit vector in the direction of the field.
+        b = field.unitb(tpos)
+        # component of v perpendicular to b:
+        vperp = v - np.dot(v,b)*b
+        # unit vector of vperp:
+        p = vperp / np.sqrt(np.dot(vperp,vperp))
+        # speed:
+        s = np.sqrt(np.dot(v,v))
+        # The new velocity vector:
+        w = s*np.sin(pa*np.pi/180)*b + s*np.cos(pa*np.pi/180)*p
+        # Reinitialize with the new velocity:
+        self.__init(self.pos, w, self.t0, self.mass, self.charge, self.field)
         
     def advance(self, delta):
         """Advance the position for time 'delta' starting at the current time, position, and velocity."""
