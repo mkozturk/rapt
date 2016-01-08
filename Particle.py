@@ -67,7 +67,7 @@ class Particle:
         # The new velocity vector
         w = s*np.sin(pa*np.pi/180)*b + s*np.cos(pa*np.pi/180)*p
         # Reinitialize with the new velocity
-        self.__init(self.pos, w, self.t0, self.mass, self.charge, self.field)
+        self.__init__(self.pos, w, self.t0, self.mass, self.charge, self.field)
         
     def advance(self, delta):
         """Advance the particle position and velocity for time 'delta' starting at the current time, position, and velocity."""
