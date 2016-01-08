@@ -14,7 +14,7 @@ from rapt.flutils import halfbouncepath, bounceperiod, gradI
 class BounceCenter:
     def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None):
         self.pos = pos  # initial position array
-        self.v0 = np.sqrt(np.dot(vel,vel))    # initial speed of the particle
+        self.v = np.sqrt(np.dot(vel,vel))    # speed of the particle
         self.tcur = t0     # current time
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
@@ -23,19 +23,23 @@ class BounceCenter:
             raise RuntimeError("BounceCenter does not work with nonstatic fields or electric fields.")
         tpos = np.concatenate([[t0],pos])
         # The initial pitch angle:
-        self.pa = np.arccos( np.dot(vel, field.B(tpos)) / (self.v0 * field.magB(tpos)) )
+        self.pa = np.arccos( np.dot(vel, field.B(tpos)) / (self.v * field.magB(tpos)) )
         
         # the first invariant value (constant)
-        self.mu = ru.magnetic_moment(t0, pos, self.v0*np.cos(self.pa), self.v0, field, mass)
+        self.mu = ru.magnetic_moment(t0, pos, self.v*np.cos(self.pa), self.v, field, mass)
         assert self.mu>0
         if not (pos==None or vel==None or t0==None): # if initial state is given explicitly
             self.trajectory = np.concatenate(([t0], pos))
             self.trajectory = np.reshape(self.trajectory, (1,4))
 
+    def setpa(self, pa):
+        """Orients the velocity vector such that the angle between velocity and field vectors is pa degrees."""
+        self.pa = pa * np.pi / 180  # convert to radians
+        self.mu = ru.magnetic_moment(self.trajectory[0], self.trajectory[1:4], self.v*np.cos(self.pa), self.v, self.field, self.mass)
+        
     def advance(self, delta):
         """Advance the position for time 'delta' starting at the current time, position, and velocity."""
- 
-        v = self.v0
+        v = self.v
         gamma = 1.0/np.sqrt(1 - (v / c)**2)
         Bm = self.mass*gamma**2*v**2/(2*self.mu)
         bp = bounceperiod(self.trajectory[-1,:4], self.field, Bm, v)
