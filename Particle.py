@@ -15,6 +15,7 @@ class Particle:
     def __init__(self, pos=None, vel=None, t0=0, mass=None, charge=None, field=None):
         self.pos = pos  # initial position array
         self.vel = vel  # initial velocity array
+        self.t0 = t0    # initial time
         self.tcur = t0    # current time
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
@@ -25,6 +26,7 @@ class Particle:
             
     def init(self, p, gyrophase=0):  # Initialization with another Particle or GuidingCenter instance
         if isinstance(p, Particle):
+            # This can be written more briefly by calling __init__
             self.mass = p.mass
             self.charge = p.charge
             self.field = p.field
@@ -34,6 +36,7 @@ class Particle:
             self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
             self.trajectory = np.reshape(self.trajectory, (1,7))
         elif isinstance(p, GuidingCenter):
+            # This can be written more briefly by calling __init__
             self.mass = p.mass
             self.charge = p.charge
             self.field = p.field
@@ -43,7 +46,29 @@ class Particle:
             self.trajectory = np.reshape(self.trajectory, (1,7))
         else:
             raise(ValueError, "Particle or GuidingCenter objects required.")
-            
+    def setpa(self, pa):
+        """Resets the velocity vector so that the pitch angle is pa degrees. Reinitializes the object."""
+        field = self.field
+        tpos = self.trajectory[-1,0:4]
+        v = self.trajectory[-1,4:] # velocity
+        
+        # Construct a vector that has the same length as v,
+        # lies on the plane spanned by v and B,
+        # and makes an angle of pa with B.
+        
+        # the unit vector in the direction of the field.
+        b = field.unitb(tpos)
+        # component of v perpendicular to b:
+        vperp = v - np.dot(v,b)*b
+        # unit vector of vperp
+        p = vperp / np.sqrt(np.dot(vperp,vperp))
+        # speed
+        s = np.sqrt(np.dot(v,v))
+        # The new velocity vector
+        w = s*np.sin(pa*np.pi/180)*b + s*np.cos(pa*np.pi/180)*p
+        # Reinitialize with the new velocity
+        self.__init(self.pos, w, self.t0, self.mass, self.charge, self.field)
+        
     def advance(self, delta):
         """Advance the particle position and velocity for time 'delta' starting at the current time, position, and velocity."""
         t = self.trajectory[-1,0]        
