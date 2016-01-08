@@ -18,7 +18,6 @@ class GuidingCenter:
     #       Update the kinetic energy at each step and get speed from it.
     def __init__(self, pos=None, vel=None, t0=None, mass=None, charge=None, field=None):
         self.pos = pos  # initial position array
-        self.vel = vel  # initial velocity
         tpos = np.concatenate([[t0], pos])        
         self.vp = np.dot(vel, field.B(tpos)) / field.magB(tpos)  # initial parallel speed
         self.v = np.sqrt(np.dot(vel,vel))    # speed of the particle
