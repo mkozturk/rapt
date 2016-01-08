@@ -39,7 +39,6 @@ class GuidingCenter:
             self.mass = p.mass
             self.charge = p.charge
             self.field = p.field
-            self.eq = p.eq
             self.mu = ru.magnetic_moment(self.tcur, self.pos, self.vp, self.v, self.field, self.mass)
             self.trajectory = np.concatenate(([self.tcur], self.pos, [self.vp]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
@@ -54,7 +53,12 @@ class GuidingCenter:
             self.trajectory = np.reshape(self.trajectory, (1,5))
         else:
             raise(ValueError, "Particle or GuidingCenter objects required.")
-        
+    def setpa(self, pa):
+        """Orients the velocity vector such that the angle between velocity and field vectors is pa degrees."""
+        pa = pa * np.pi / 180  # convert to radians        
+        self.vp = self.v * np.cos(pa)
+        self.mu = ru.magnetic_moment(self.trajectory[0], self.trajectory[1:4], self.vp, self.v, self.field, self.mass)
+
     def isadiabatic(self):
         """Returns True if the particle's motion satisfies the adiabaticity conditions
         at the present location."""
