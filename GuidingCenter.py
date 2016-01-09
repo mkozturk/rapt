@@ -96,15 +96,26 @@ class GuidingCenter:
             and self.cycper() / self.field.timescale(self.trajectory[-1,:4]) < eps_t
     
     def advance(self, delta):
-        if params["GCeq"] == "northropteller":
-            self.NorthropTellerAdvance(delta)
-        elif params["GCeq"] == "brizardchan":
-            self.BrizardChanAdvance(delta)
+        if self.field.isstatic:
+            if params["GCeq"] == "northropteller":
+                self.NorthropTellerAdvance(delta)
+            elif params["GCeq"] == "brizardchan":
+                self.BrizardChanAdvance(delta)
+            else:
+                raise Exception("Guiding-center equation "+params["GCeq"]+" not implemented.")
         else:
-            raise Exception("Guiding-center equation "+params["GCeq"]+" not implemented.")
-        
+            self.TaoChanBrizardAdvance(delta)
+    
+    def TaoChanBrizardAdvance(self, delta):
+        # To be used when electric fields are nonzero and/or fields vary in time.
+        # Reference: Tao, X., A. A. Chan, and A. J. Brizard (2007),
+        # Hamiltonian theory of adiabatic motion of relativistic charged particles,
+        # Phys. Plasmas, 14, 092107, doi:10.1063/1.2773702
+        pass
+    
     def NorthropTellerAdvance(self, delta):
-        """Advance the GC position and parallel speed for time 'delta' starting at the current time, position, parallel speed."""
+        # The "classic" equations of motion for the guiding center.
+        # Superseded by other equations such as the Brizard-Chan.
         dt = params["GCtimestep"]
         gamma = 1.0/np.sqrt(1 - (self.v/c)**2)
         
@@ -130,6 +141,10 @@ class GuidingCenter:
         self.tcur = self.trajectory[-1,0]
     
     def BrizardChanAdvance(self, delta):
+        # Highly accurate GC equations of motion.
+        # Reference: A. J. Brizard and A. A. Chan, 
+        # Nonlinear relativistic gyrokinetic Vlasov-Maxwell equations, 
+        # Phys. Plasmas 6, 4548 (1999)
         dt = params["GCtimestep"]
         gamma = 1.0/np.sqrt(1 - (self.v/c)**2)
 
