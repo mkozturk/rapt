@@ -59,7 +59,7 @@ class _Field:
             ))
         return np.dot(self._M1, beta) / (2*d)
     
-    def dBdt(self, tpos):
+    def dBdt(self, tpos):  # time derivative of the magnetic field magnitude.
         if self.static:
             return 0
         else:
@@ -68,6 +68,15 @@ class _Field:
             B2 = self.magB(tpos + [d,0,0,0])
             return (B2-B1)/d/2
     
+    def dbdt(self, tpos):   # time derivative of the magnetic field direction.
+        if self.static:
+            return 0
+        else:
+            d = self.timederivstepsize
+            b1 = self.unitb(tpos - [d,0,0,0])
+            b2 = self.unitb(tpos + [d,0,0,0])
+            return (b2-b1)/d/2
+
     def lengthscale(self, tpos):
         """Returns B/| grad |B| |, the length scale of the change of the magnetic field strength."""
         g = self.gradB(tpos)
