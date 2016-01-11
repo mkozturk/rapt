@@ -111,7 +111,33 @@ class GuidingCenter:
         # Reference: Tao, X., A. A. Chan, and A. J. Brizard (2007),
         # Hamiltonian theory of adiabatic motion of relativistic charged particles,
         # Phys. Plasmas, 14, 092107, doi:10.1063/1.2773702
-        pass
+        dt = params["GCtimestep"]
+        m = self.mass
+        def deriv(Y, t=0):
+            B = self.field.B(Y[:4])
+            Bmag = np.sqrt(np.dot(B,B))
+            unitb = B / Bmag
+            gamma - np.sqrt(1 + self.mu*Bmag/(m*c*c) + (Y[4]/(m*c)**2)
+            cb = self.field.curlb(Y[:4])
+            Bstar = B + Y[4] * cb / self.charge
+            Bstarpar = np.dot(Bstar,unitb)
+            E = self.field.E(Y[:4])
+            dbdt = self.field.dbdt(Y[:4])
+            gB = self.field.gradB(Y[:4])
+            Estar = E - (Y[4]*dbdt - self.mu * gB / gamma )/ self.charge)
+            
+            retval = np.ones(5) 
+            retval[1:4] = (Y[4] * Bstar / (gamma*m) + np.cross(Estar,unitb) ) / Bstarpar
+            retval[4] = self.charge*np.dot(Estar,Bstar) / Bstarpar
+            return retval
+        if delta <= dt:
+            times = np.array([self.tcur, self.tcur+delta])
+        else:
+            times = np.arange(self.tcur, self.tcur+delta, dt)
+        rtol, atol = params["solvertolerances"]
+        traj = odeint(deriv, self.trajectory[-1,:], times, rtol=rtol, atol=atol)
+        self.trajectory = np.concatenate((self.trajectory, traj[1:,:]))
+        self.tcur = self.trajectory[-1,0]
     
     def NorthropTellerAdvance(self, delta):
         # The "classic" equations of motion for the guiding center.
