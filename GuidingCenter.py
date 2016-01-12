@@ -36,7 +36,7 @@ class GuidingCenter:
             self.tcur = p.trajectory[-1,0]            
             self.pos = p.trajectory[-1,1:4]
             self.vp = p.trajectory[-1,4]
-            self.v = p.v
+            self.v = p.v 
             self.mass = p.mass
             self.charge = p.charge
             self.field = p.field
@@ -117,14 +117,14 @@ class GuidingCenter:
             B = self.field.B(Y[:4])
             Bmag = np.sqrt(np.dot(B,B))
             unitb = B / Bmag
-            gamma - np.sqrt(1 + self.mu*Bmag/(m*c*c) + (Y[4]/(m*c)**2)
+            gamma = np.sqrt(1 + self.mu*Bmag/(m*c*c) + (Y[4]/(m*c)**2))
             cb = self.field.curlb(Y[:4])
             Bstar = B + Y[4] * cb / self.charge
             Bstarpar = np.dot(Bstar,unitb)
             E = self.field.E(Y[:4])
             dbdt = self.field.dbdt(Y[:4])
             gB = self.field.gradB(Y[:4])
-            Estar = E - (Y[4]*dbdt - self.mu * gB / gamma )/ self.charge)
+            Estar = E - (Y[4]*dbdt - self.mu * gB / gamma)/self.charge
             
             retval = np.ones(5) 
             retval[1:4] = (Y[4] * Bstar / (gamma*m) + np.cross(Estar,unitb) ) / Bstarpar
