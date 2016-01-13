@@ -20,6 +20,7 @@ class BounceCenter:
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
         self.field = field  # the field object
+        self.isequatorial = False  # Temporary. Later replace with an algorithm.
         if not field.isstatic:
             raise RuntimeError("BounceCenter does not work with nonstatic fields or electric fields.")
         tpos = np.concatenate([[t0],pos])
@@ -65,14 +66,23 @@ class BounceCenter:
         dt = params['BCtimestep'] * bp
         
         def deriv(Y, t=0):
-            out = np.zeros(4)
-            out[0] = 1        # dt/dt = 1
-            Bvec = self.field.B(Y[:4])
-            magBsq = np.dot(Bvec, Bvec)
-            Sb = halfbouncepath(Y[:4], self.field, Bm)
-            gI = gradI(Y[:4], self.field, Bm)
-            out[1:4] = gamma*self.mass*v*v/(self.charge*Sb*magBsq) * np.cross(gI,Bvec)  # d(pos)/dt = vel
-            return out
+            if self.isequatorial:
+                out = np.zeros(4)
+                out[0] = 1        # dt/dt = 1
+                Bvec = self.field.B(Y[:4])
+                magBsq = np.dot(Bvec, Bvec)
+                gB = self.field.gradB(Y[:4])
+                out[1:4] = self.mu*np.cross(B,gB)/(self.charge*gamma*magBsq)
+                return out
+            else:
+                out = np.zeros(4)
+                out[0] = 1        # dt/dt = 1
+                Bvec = self.field.B(Y[:4])
+                magBsq = np.dot(Bvec, Bvec)
+                Sb = halfbouncepath(Y[:4], self.field, Bm)
+                gI = gradI(Y[:4], self.field, Bm)
+                out[1:4] = gamma*self.mass*v*v/(self.charge*Sb*magBsq) * np.cross(gI,Bvec)  # d(pos)/dt = vel
+                return out
             
         rtol, atol = params["solvertolerances"]
         times = np.arange(self.tcur, self.tcur+delta, dt)
