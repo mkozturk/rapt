@@ -8,7 +8,7 @@ import numpy as np
 from scipy.integrate import odeint
 
 import rapt.utils as ru
-from rapt import c, params, Particle
+from rapt import c, params
 
 class GuidingCenter:
     def __init__(self, pos=None, v=None, pa=None, ppar=None, t0=0, mass=None, charge=None, field=None):
@@ -40,6 +40,7 @@ class GuidingCenter:
             self.trajectory = np.reshape(self.trajectory, (1,5))
     
     def init(self, p):  # Initialization with another Particle or GuidingCenter instance
+        from rapt import Particle # Import here to avoid circular imports. 
         if isinstance(p, GuidingCenter):
             B = p.field.magB(p.trajectory[-1,:4])            
             gammasq = 1 + 2*p.mu*B/(p.mass*c*c) + (p.trajectory[-1,4]/p.mass/c)**2

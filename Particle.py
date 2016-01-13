@@ -9,7 +9,7 @@ import numpy as np
 from scipy.integrate import odeint
 
 import rapt.utils as ru
-from rapt import c, params, GuidingCenter
+from rapt import c, params
 
 class Particle:
     def __init__(self, pos=None, vel=None, t0=0, mass=None, charge=None, field=None):
@@ -25,6 +25,7 @@ class Particle:
             self.trajectory = np.reshape(self.trajectory, (1,7))
             
     def init(self, p, gyrophase=0):  # Initialization with another Particle or GuidingCenter instance
+        from rapt import GuidingCenter # Import here to avoid circular imports.        
         if isinstance(p, Particle):
             self.__init__(pos=p.trajectory[-1,1:4], 
                           vel=p.trajectory[-1,4:],
