@@ -26,24 +26,42 @@ class Particle:
             
     def init(self, p, gyrophase=0):  # Initialization with another Particle or GuidingCenter instance
         if isinstance(p, Particle):
-            # This can be written more briefly by calling __init__
-            self.mass = p.mass
-            self.charge = p.charge
-            self.field = p.field
-            self.tcur = p.trajectory[-1,0]            
-            self.pos = p.trajectory[-1,1:4]
-            self.vel = p.trajectory[-1,4:]
-            self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
-            self.trajectory = np.reshape(self.trajectory, (1,7))
+            self.__init__(pos=p.trajectory[-1,1:4], 
+                          vel=p.trajectory[-1,4:],
+                          t0=p.trajectory[-1,0], 
+                          mass=p.mass, 
+                          charge=p.charge,
+                          field=p.field)
+#            # This can be written more briefly by calling __init__
+#            self.mass = p.mass
+#            self.charge = p.charge
+#            self.field = p.field
+#            self.tcur = p.trajectory[-1,0]            
+#            self.pos = p.trajectory[-1,1:4]
+#            self.vel = p.trajectory[-1,4:]
+#            self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
+#            self.trajectory = np.reshape(self.trajectory, (1,7))
         elif isinstance(p, GuidingCenter):
-            # This can be written more briefly by calling __init__
-            self.mass = p.mass
-            self.charge = p.charge
-            self.field = p.field
-            self.tcur = p.trajectory[-1,0]
-            self.pos, self.vel = ru.GCtoFP(self.tcur, p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge, gyrophase)
-            self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
-            self.trajectory = np.reshape(self.trajectory, (1,7))
+            B = p.field.magB(p.trajectory[-1,:4])            
+            gammasq = 1 + 2*p.mu*B/(p.mass*c*c) + (p.trajectory[-1,4]/p.mass/c)**2
+            v = c * np.sqrt(1-1/gammasq)
+            vpar = p.trajectory[-1,4]/p.mass/np.sqrt(gammasq)
+            self.pos, self.vel = ru.GCtoFP(self.tcur, 
+                                           p.trajectory[-1,1:4], 
+                                           vpar, 
+                                           v, 
+                                           p.field, 
+                                           p.mass, 
+                                           p.charge, 
+                                           gyrophase)
+#             This can be written more briefly by calling __init__
+#            self.mass = p.mass
+#            self.charge = p.charge
+#            self.field = p.field
+#            self.tcur = p.trajectory[-1,0]
+#            self.pos, self.vel = ru.GCtoFP(self.tcur, p.trajectory[-1,1:4], p.trajectory[-1,4], p.v, self.field, self.mass, self.charge, gyrophase)
+#            self.trajectory = np.concatenate(([self.tcur], self.pos, self.vel))
+#            self.trajectory = np.reshape(self.trajectory, (1,7))
         else:
             raise(ValueError, "Particle or GuidingCenter objects required.")
     def setpa(self, pa):
