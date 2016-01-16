@@ -24,19 +24,24 @@ class GuidingCenter:
     
         self.pos = pos  # initial position array
         self.v = v
-        if pa != None:
-            gamma = 1/np.sqrt(1-(v/c)**2)
-            ppar = gamma * mass * v * np.cos(pa*np.pi/180)
-        
+        gamma = 1/np.sqrt(1-(v/c)**2)
+
         self.t0 = t0 # initial time
         self.tcur = t0    # current time
         self.mass = mass  # mass of the particle
         self.charge = charge  # charge of the particle
+        if pa != None:
+            if pa == 90:
+                vpar = 0
+            else:
+                vpar = v * np.cos(pa*np.pi/180)
+            ppar = gamma*mass*vpar
+
         self.field = field
         if not (pos==None or v==None or ppar==None): # if initial state is given explicitly
-            self.mu = ru.magnetic_moment(self.tcur, self.pos, ppar/gamma/mass,
+            self.mu = ru.magnetic_moment(self.tcur, self.pos, vpar,
                                          self.v, self.field, self.mass)
-            self.trajectory = np.concatenate(([t0], pos, ppar))
+            self.trajectory = np.concatenate(([t0], pos, [ppar]))
             self.trajectory = np.reshape(self.trajectory, (1,5))
     
     def init(self, p):  # Initialization with another Particle or GuidingCenter instance
@@ -117,6 +122,7 @@ class GuidingCenter:
     
     def advance(self, delta):
         self.TaoChanBrizardAdvance(delta)
+        #self.BrizardChanAdvance(delta)
 #        if self.field.isstatic:
 #            if params["GCeq"] == "northropteller":
 #                self.NorthropTellerAdvance(delta)
@@ -138,14 +144,14 @@ class GuidingCenter:
             B = self.field.B(Y[:4])
             Bmag = np.sqrt(np.dot(B,B))
             unitb = B / Bmag
-            gamma = np.sqrt(1 + 2*self.mu*Bmag/(m*c*c) + (Y[4]/(m*c)**2))
+            gamma = np.sqrt(1 + 2*self.mu*Bmag/(m*c*c) + (Y[4]/(m*c))**2)
             cb = self.field.curlb(Y[:4])
             Bstar = B + Y[4] * cb / self.charge
             Bstarpar = np.dot(Bstar,unitb)
             E = self.field.E(Y[:4])
             dbdt = self.field.dbdt(Y[:4])
             gB = self.field.gradB(Y[:4])
-            Estar = E - (Y[4]*dbdt - self.mu * gB / gamma)/self.charge
+            Estar = E - (Y[4]*dbdt + self.mu * gB / gamma)/self.charge
             
             retval = np.ones(5) 
             retval[1:4] = (Y[4] * Bstar / (gamma*m) + np.cross(Estar,unitb) ) / Bstarpar
@@ -270,10 +276,17 @@ class GuidingCenter:
             return ru.cyclotron_period2(t, r, v, self.field, self.mass, self.charge)
 
     def ke(self):
-        # BUG: Drift speed term not added.
-        mc2 = self.mass*c**2
-        gammasq = 1/(1 - (self.v/c)**2)
-        return np.sqrt(2*self.mu*self.getB()*mc2 + gammasq*self.mass*mc2*self.trajectory[:,4]**2 + mc2**2) - mc2
+        mc = self.mass*c
+        mc2 = mc*c
+#        if self.field.isstatic:
+#            gammasq = 1/(1 - (self.v/c)**2)
+#            return np.sqrt(2*self.mu*self.getB()*mc2
+#                        + gammasq*self.mass*mc2*self.trajectory[:,4]**2 
+#                        + mc2**2) - mc2
+#        else:
+        gammasq = 1 + 2*self.mu*self.getB()/mc2 + (self.trajectory[:,4]/mc)**2
+        return (np.sqrt(gammasq)-1)*mc2
+        
     
     def kenr(self):
         # BUG: Drift speed term not added.
