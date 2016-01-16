@@ -69,7 +69,7 @@ class _Field:
             return (B2-B1)/d/2
     
     def dbdt(self, tpos):   # time derivative of the magnetic field direction.
-        if self.static:
+        if self.isstatic:
             return 0
         else:
             d = self.timederivstepsize
