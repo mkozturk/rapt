@@ -4,7 +4,6 @@ Created on Fri Oct 23 14:54:01 2015
 
 @author: kaan
 """
-import sys
 import numpy as np
 
 from rapt import params
