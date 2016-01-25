@@ -8,14 +8,14 @@ def cyclotron_period(t, pos, vel, field, mass, charge):
     # Use with Particle.
     gamma = 1.0/np.sqrt(1 - np.dot(vel,vel)/c**2)
     B = field.magB(np.concatenate([[t], pos]))
-    return 2*np.pi*gamma*mass*B/abs(charge)
+    return 2*np.pi*gamma*mass/B/abs(charge)
 
 def cyclotron_period2(t, pos, speed, field, mass, charge):
     """Returns the period of the cyclotron motion of a particle."""
     # Use with GuidingCenter.
     gamma = 1.0/np.sqrt(1 - (speed/c)**2)
     B = field.magB(np.concatenate([[t], pos]))
-    return 2*np.pi*gamma*mass*B/abs(charge)
+    return 2*np.pi*gamma*mass/B/abs(charge)
 
 def cyclotron_radius(t, pos,vel,field,mass,charge):
     """Returns the period of a particle at given position and velocity."""
