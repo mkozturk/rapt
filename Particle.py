@@ -65,6 +65,15 @@ class Particle:
 #            self.trajectory = np.reshape(self.trajectory, (1,7))
         else:
             raise(ValueError, "Particle or GuidingCenter objects required.")
+
+    def setKE(self,KE, unit="ev"):
+        """Scales the velocity vector with the speed corresponding to the given kinetic energy.
+        Reinitializes the object."""
+        s = ru.speedfromKE(KE, self.mass, unit)
+        v = self.trajectory[-1,4:]
+        v = v*(s/np.sqrt(np.dot(v,v)))
+        self.__init__(self.pos, v, self.t0, self.mass, self.charge, self.field)
+
     def setpa(self, pa):
         """Resets the velocity vector so that the pitch angle is pa degrees. Reinitializes the object."""
         field = self.field
@@ -77,10 +86,13 @@ class Particle:
         
         # the unit vector in the direction of the field.
         b = field.unitb(tpos)
-        # component of v perpendicular to b:
-        vperp = v - np.dot(v,b)*b
-        # unit vector of vperp
-        p = vperp / np.sqrt(np.dot(vperp,vperp))
+        spar = np.dot(v,b)   # parallel speed
+        
+        if spar < 1e-12:  # if velocity is parallel to b
+            p = ru.getperp(b)  # get a vector perp. to b, direction otherwise 'random'
+        else:
+            vperp = v - spar*b # component of v perpendicular to b
+            p = vperp / np.sqrt(np.dot(vperp,vperp)) # unit vector of vperp
         # speed
         s = np.sqrt(np.dot(v,v))
         # The new velocity vector
