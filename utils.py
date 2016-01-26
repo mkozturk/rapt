@@ -84,6 +84,27 @@ def guidingcenter(t, r, v, field, mass, charge, tol=1e-3, maxiter=20, debug=Fals
         iteration += 1
     print("Could not reach the specified tolerance after ", iteration, " iterations.")
 
+def getperp(v):
+    """Returns a unit vector perpendicular to v."""
+    # For the input vector (x,y,z) and output vector (a,b,c)
+    # the equation ax + by + cz = 0 must be satisfied.
+    assert(len(v)==3)
+    if v[0] == 0.0 and v[1] == 0.0 and v[2] == 0.0:
+        raise ValueError('Zero vector')
+
+    if v[0]==0:
+        return np.array([1,0,0])
+    if v[1]==0:
+        return np.array([0,1,0])
+    if v[2]==0:
+        return np.array([0,0,1])
+    
+    # arbitrarily set a = b = 1
+    # then the equation simplifies to
+    #     c = -(x + y)/z
+    cc = -1.0 * (v[0] + v[1]) / v[2]
+    return np.array([1, 1, cc])/np.sqrt(2+cc**2)
+        
 def GCtoFP(t, R, vp, speed, field, mass, charge, gyrophase):
     """Returns a particle position for the given guiding center."""
     def getperp(v):
