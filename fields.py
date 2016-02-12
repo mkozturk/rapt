@@ -1,5 +1,7 @@
 import numpy as np
 from rapt import Re, B0
+from scipy.interpolate import RegularGridInterpolator
+
 class _Field:
     # A general field class.
     # Will be subclassed; not for direct use.
@@ -100,6 +102,39 @@ class EarthDipole(_Field):
         
         return self.coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
 
+class EarthDipoleC(_Field):
+    import ctypes
+    _dip = ctypes.CDLL("./rapt/libdip.so")
+    _dip.dipole.argtypes = [ctypes.c_double,
+                            ctypes.c_double,
+                            ctypes.c_double,
+                            ctypes.POINTER(ctypes.c_double)]
+    _dip.dipole.restype = None
+    def B(self,tpos):
+        res = (self.ctypes.c_double * 3)()
+        t,x,y,z = tpos
+        self._dip.dipole(x/Re,y/Re,z/Re,res)
+        return -B0*np.array(res)
+ 
+class DoubleDipoleC(_Field):
+    import ctypes
+    _dip = ctypes.CDLL("./rapt/libdip.so")
+    _dip.doubledipole.argtypes = [ctypes.c_double,
+                                  ctypes.c_double,
+                                  ctypes.c_double,
+                                  ctypes.POINTER(ctypes.c_double)]
+    _dip.doubledipole.restype = None
+    def __init__(self, standoff=10*Re, imagestrength=1):
+        _Field.__init__(self)
+        self.gradientstepsize = Re/1000
+        self.dd = 2*standoff  # distance between two dipoles
+        self.k = imagestrength   # >=1. Relative strength of the image dipole.
+    def B(self, tpos):
+        res = (self.ctypes.c_double * 3)()
+        t,x,y,z = tpos
+        self._dip.doubledipole(x/Re,y/Re,z/Re,res)
+        return -B0*np.array(res)
+
 class DoubleDipole(_Field):
     def __init__(self, standoff=10*Re, imagestrength=1):
         _Field.__init__(self)
@@ -112,7 +147,7 @@ class DoubleDipole(_Field):
         x -= self.dd
         B2 = self.k * np.array([3*x*z, 3*y*z, (2*z*z -x*x- y*y)]) / pow(x*x+y*y+z*z, 5.0/2.0)
         return (-B0*Re**3)*(B1+B2)
-        
+
 class UniformBz(_Field):
     def __init__(self, Bz=1):
         _Field.__init__(self)
@@ -161,3 +196,59 @@ class DipoleAndLinear(_Field):
     def B(self, tpos):
         t,x,y,z = tpos
         return B0*x/(10*Re)**4 - B0*Re**3 / pow(x*x+y*y+z*z, 5.0/2.0) * np.array([3*x*z, 3*y*z, (2*z*z -x*x- y*y)])
+
+class Grid(_Field):
+    def __init__(self):
+        _Field.__init__(self)
+        self.times = []  # list of time values for each stored grid
+        self.grids = {}  # dictionary of interpolated field functions, indexed by time.
+
+    def generate(self,f,tmin,tmax,xmin,xmax,ymin,ymax,zmin,zmax,nt,nx,ny,nz):
+#        # Generate grids using the specified field function.
+
+        x = np.linspace(xmin,xmax,nx)
+        y = np.linspace(ymin,ymax,ny)
+        z = np.linspace(zmin,zmax,nz)
+        self.times = np.linspace(tmin,tmax,nt)
+        for t in self.times:
+            B_x = np.zeros((nx,ny,nz),dtype='float')
+            B_y = np.zeros((nx,ny,nz),dtype='float')
+            B_z = np.zeros((nx,ny,nz),dtype='float')
+            for i in range(nx):
+                for j in range(ny):
+                    for k in range(nz):
+                        Bvec = f.B([t,x[i],y[j],z[k]])
+                        B_x[i][j][k] = Bvec[0]
+                        B_y[i][j][k] = Bvec[1]
+                        B_z[i][j][k] = Bvec[2]
+            self.grids[t] = [RegularGridInterpolator((x,y,z),B_x),
+                        RegularGridInterpolator((x,y,z),B_y),
+                        RegularGridInterpolator((x,y,z),B_z)]
+
+    def read(self, t, x, y, z, Bx, By, Bz, Ex, Ey, Ez):
+        self.times = t
+        for tt in self.times:
+            self.grids[t] = [RegularGridInterpolator((x,y,z),Bx),
+                        RegularGridInterpolator((x,y,z),By),
+                        RegularGridInterpolator((x,y,z),Bz)]
+
+    def B(self, tpos):
+        # Warning: Works only with single time instant
+        bg = self.grids[0]
+        Bx = bg[0](tpos[1:])[0]
+        By = bg[1](tpos[1:])[0]
+        Bz = bg[2](tpos[1:])[0]
+        return np.array([Bx,By,Bz])
+
+class spdipole(_Field):
+    import spacepy.time as spt
+    import spacepy.coordinates as spc
+    import spacepy.irbempy as ib
+    def __init__(self):
+        _Field.__init__(self)
+    def B(self,tpos):
+        t = self.spt.Ticktock(['2002-01-01T12:00:00'], 'ISO')
+        pos = self.spc.Coords(tpos[1:]/Re, 'GSM', 'car')
+        Bvec = self.ib.get_Bfield(t,pos,extMag='0',options=[0,0,0,0,5])
+        
+        return Bvec['Bvec'][0]*1e-9
