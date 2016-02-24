@@ -1,5 +1,5 @@
 import numpy as np
-from rapt import Re, B0
+from rapt import Re, B0,utils
 from scipy.interpolate import RegularGridInterpolator
 
 class _Field:
@@ -201,19 +201,24 @@ class Grid(_Field):
     def __init__(self):
         _Field.__init__(self)
         self.times = []  # list of time values for each stored grid
-        self.grids = {}  # dictionary of interpolated field functions, indexed by time.
+        self.grids = []  # list of interpolated field functions, same order as times.
+        # Each element of grids: [Bx,By,Bz,Ex,Ey,Ez] (6 interpolated functions)
 
     def generate(self,f,tmin,tmax,xmin,xmax,ymin,ymax,zmin,zmax,nt,nx,ny,nz):
-#        # Generate grids using the specified field function.
+        # Generate grids using the specified field object.
 
         x = np.linspace(xmin,xmax,nx)
         y = np.linspace(ymin,ymax,ny)
         z = np.linspace(zmin,zmax,nz)
         self.times = np.linspace(tmin,tmax,nt)
+        self.grids = []
         for t in self.times:
             B_x = np.zeros((nx,ny,nz),dtype='float')
             B_y = np.zeros((nx,ny,nz),dtype='float')
             B_z = np.zeros((nx,ny,nz),dtype='float')
+            E_x = np.zeros((nx,ny,nz),dtype='float')
+            E_y = np.zeros((nx,ny,nz),dtype='float')
+            E_z = np.zeros((nx,ny,nz),dtype='float')
             for i in range(nx):
                 for j in range(ny):
                     for k in range(nz):
@@ -221,25 +226,122 @@ class Grid(_Field):
                         B_x[i][j][k] = Bvec[0]
                         B_y[i][j][k] = Bvec[1]
                         B_z[i][j][k] = Bvec[2]
-            self.grids[t] = [RegularGridInterpolator((x,y,z),B_x),
+                        Evec = f.E([t,x[i],y[j],z[k]])
+                        E_x[i][j][k] = Evec[0]
+                        E_y[i][j][k] = Evec[1]
+                        E_z[i][j][k] = Evec[2]
+            self.grids.append( [RegularGridInterpolator((x,y,z),B_x),
                         RegularGridInterpolator((x,y,z),B_y),
-                        RegularGridInterpolator((x,y,z),B_z)]
+                        RegularGridInterpolator((x,y,z),B_z),
+                        RegularGridInterpolator((x,y,z),E_x),
+                        RegularGridInterpolator((x,y,z),E_y),
+                        RegularGridInterpolator((x,y,z),E_z)] )
 
-    def read(self, t, x, y, z, Bx, By, Bz, Ex, Ey, Ez):
-        self.times = t
-        for tt in self.times:
-            self.grids[t] = [RegularGridInterpolator((x,y,z),Bx),
-                        RegularGridInterpolator((x,y,z),By),
-                        RegularGridInterpolator((x,y,z),Bz)]
+    def readgrid(self, t, x, y, z, Bx, By, Bz, Ex, Ey, Ez):
+        self.times.append(t)
+        B = [RegularGridInterpolator((x,y,z),Bx),
+             RegularGridInterpolator((x,y,z),By),
+             RegularGridInterpolator((x,y,z),Bz)]
+        E = [RegularGridInterpolator((x,y,z),Ex),
+             RegularGridInterpolator((x,y,z),Ey),
+             RegularGridInterpolator((x,y,z),Ez)]
+        self.grids.append(B+E)
 
     def B(self, tpos):
+        t,x,y,z = tpos
         # Warning: Works only with single time instant
         bg = self.grids[0]
         Bx = bg[0](tpos[1:])[0]
         By = bg[1](tpos[1:])[0]
         Bz = bg[2](tpos[1:])[0]
         return np.array([Bx,By,Bz])
+        
+    def E(self, tpos):
+        # Warning: Works only with single time instant
+        bg = self.grids[0]
+        Ex = bg[3](tpos[1:])[0]
+        Ey = bg[4](tpos[1:])[0]
+        Ez = bg[5](tpos[1:])[0]
+        return np.array([Ex,Ey,Ez])
 
+
+class RCMF(Grid):
+    coeff = -3*B0*Re**3
+    zero3 = np.zeros(3)
+    def __init__(self):
+        super(RCMF,self).__init__()
+
+    def readgrid(self, t, x, y, z, Bx, By, Bz):
+        self.times.append(t)
+        B = [RegularGridInterpolator((x,y,z),Bx),
+             RegularGridInterpolator((x,y,z),By),
+             RegularGridInterpolator((x,y,z),Bz)]
+
+        self.grids.append(B)
+
+    def B(self, tpos):
+        t,x,y,z = tpos
+        # Warning: Works only with single time instant
+        bg = self.grids[0]
+        
+        if tpos[3]<0:
+            tpos[3] *= -1
+            Bx = -bg[0](tpos[1:])[0]
+            By = -bg[1](tpos[1:])[0]
+            Bz = bg[2](tpos[1:])[0]
+        else:
+            Bx = bg[0](tpos[1:])[0]
+            By = bg[1](tpos[1:])[0]
+            Bz = bg[2](tpos[1:])[0]
+            
+        # Add the dipole component
+        r2 = x*x+y*y+z*z
+        
+        Bdip =  self.coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
+        return np.array([Bx,By,Bz])+Bdip
+        
+    def E(self, tpos):
+        return self.zero3
+
+class RCMF_tricubic(Grid):
+    from tricubic import tricubic
+    coeff = -3*B0*Re**3
+    zero3 = np.zeros(3)
+    def __init__(self):
+        super(RCMF_tricubic,self).__init__()
+
+    def readgrid(self, t, x, y, z, Bx, By, Bz):
+        self.times.append(t)
+        nx,ny,nz = Bx.shape
+        Bxif = self.tricubic(list(Bx),[nx,ny,nz]).ip
+        Byif = self.tricubic(list(By),[nx,ny,nz]).ip
+        Bzif = self.tricubic(list(Bz),[nx,ny,nz]).ip
+        B = [Bxif, Byif, Bzif]
+        self.grids.append(B)
+
+    def B(self, tpos):
+        t,x,y,z = tpos
+        # Warning: Works only with single time instant
+        bg = self.grids[0]
+        
+        if tpos[3]<0:
+            tpos[3] *= -1
+            Bx = -bg[0](list(tpos[1:]))
+            By = -bg[1](list(tpos[1:]))
+            Bz = bg[2](list(tpos[1:]))
+        else:
+            Bx = bg[0](list(tpos[1:]))
+            By = bg[1](list(tpos[1:]))
+            Bz = bg[2](list(tpos[1:]))            
+        # Add the dipole component
+        r2 = x*x+y*y+z*z
+        
+        Bdip =  self.coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
+        return np.array([Bx,By,Bz])+Bdip
+        
+    def E(self, tpos):
+        return self.zero3
+    
 class spdipole(_Field):
     import spacepy.time as spt
     import spacepy.coordinates as spc
