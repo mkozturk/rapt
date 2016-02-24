@@ -121,8 +121,9 @@ class GuidingCenter:
             and self.cycper() / self.field.timescale(self.trajectory[-1,:4]) < eps_t
     
     def advance(self, delta):
+        #self.NorthropTellerAdvance(delta)
         self.TaoChanBrizardAdvance(delta)
-        #self.BrizardChanAdvance(delta)
+#        self.BrizardChanAdvance(delta)
 #        if self.field.isstatic:
 #            if params["GCeq"] == "northropteller":
 #                self.NorthropTellerAdvance(delta)
