@@ -303,54 +303,54 @@ class RCMF(Grid):
     def E(self, tpos):
         return self.zero3
 
-class RCMF_tricubic(Grid):
-    from tricubic import tricubic
-    coeff = -3*B0*Re**3
-    zero3 = np.zeros(3)
-    def __init__(self):
-        super(RCMF_tricubic,self).__init__()
-
-    def readgrid(self, t, x, y, z, Bx, By, Bz):
-        self.times.append(t)
-        nx,ny,nz = Bx.shape
-        Bxif = self.tricubic(list(Bx),[nx,ny,nz]).ip
-        Byif = self.tricubic(list(By),[nx,ny,nz]).ip
-        Bzif = self.tricubic(list(Bz),[nx,ny,nz]).ip
-        B = [Bxif, Byif, Bzif]
-        self.grids.append(B)
-
-    def B(self, tpos):
-        t,x,y,z = tpos
-        # Warning: Works only with single time instant
-        bg = self.grids[0]
-        
-        if tpos[3]<0:
-            tpos[3] *= -1
-            Bx = -bg[0](list(tpos[1:]))
-            By = -bg[1](list(tpos[1:]))
-            Bz = bg[2](list(tpos[1:]))
-        else:
-            Bx = bg[0](list(tpos[1:]))
-            By = bg[1](list(tpos[1:]))
-            Bz = bg[2](list(tpos[1:]))            
-        # Add the dipole component
-        r2 = x*x+y*y+z*z
-        
-        Bdip =  self.coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
-        return np.array([Bx,By,Bz])+Bdip
-        
-    def E(self, tpos):
-        return self.zero3
-    
-class spdipole(_Field):
-    import spacepy.time as spt
-    import spacepy.coordinates as spc
-    import spacepy.irbempy as ib
-    def __init__(self):
-        _Field.__init__(self)
-    def B(self,tpos):
-        t = self.spt.Ticktock(['2002-01-01T12:00:00'], 'ISO')
-        pos = self.spc.Coords(tpos[1:]/Re, 'GSM', 'car')
-        Bvec = self.ib.get_Bfield(t,pos,extMag='0',options=[0,0,0,0,5])
-        
-        return Bvec['Bvec'][0]*1e-9
+#class RCMF_tricubic(Grid):
+#    from tricubic import tricubic
+#    coeff = -3*B0*Re**3
+#    zero3 = np.zeros(3)
+#    def __init__(self):
+#        super(RCMF_tricubic,self).__init__()
+#
+#    def readgrid(self, t, x, y, z, Bx, By, Bz):
+#        self.times.append(t)
+#        nx,ny,nz = Bx.shape
+#        Bxif = self.tricubic(list(Bx),[nx,ny,nz]).ip
+#        Byif = self.tricubic(list(By),[nx,ny,nz]).ip
+#        Bzif = self.tricubic(list(Bz),[nx,ny,nz]).ip
+#        B = [Bxif, Byif, Bzif]
+#        self.grids.append(B)
+#
+#    def B(self, tpos):
+#        t,x,y,z = tpos
+#        # Warning: Works only with single time instant
+#        bg = self.grids[0]
+#        
+#        if tpos[3]<0:
+#            tpos[3] *= -1
+#            Bx = -bg[0](list(tpos[1:]))
+#            By = -bg[1](list(tpos[1:]))
+#            Bz = bg[2](list(tpos[1:]))
+#        else:
+#            Bx = bg[0](list(tpos[1:]))
+#            By = bg[1](list(tpos[1:]))
+#            Bz = bg[2](list(tpos[1:]))            
+#        # Add the dipole component
+#        r2 = x*x+y*y+z*z
+#        
+#        Bdip =  self.coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
+#        return np.array([Bx,By,Bz])+Bdip
+#        
+#    def E(self, tpos):
+#        return self.zero3
+#    
+#class spdipole(_Field):
+#    import spacepy.time as spt
+#    import spacepy.coordinates as spc
+#    import spacepy.irbempy as ib
+#    def __init__(self):
+#        _Field.__init__(self)
+#    def B(self,tpos):
+#        t = self.spt.Ticktock(['2002-01-01T12:00:00'], 'ISO')
+#        pos = self.spc.Coords(tpos[1:]/Re, 'GSM', 'car')
+#        Bvec = self.ib.get_Bfield(t,pos,extMag='0',options=[0,0,0,0,5])
+#        
+#        return Bvec['Bvec'][0]*1e-9
