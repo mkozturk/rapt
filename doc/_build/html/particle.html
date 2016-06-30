@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Particle &mdash; rapt 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="rapt 0.9 documentation" href="index.html" />
+    <link rel="prev" title="Rapt - Rice Adaptive Particle Tracer" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Rapt - Rice Adaptive Particle Tracer"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rapt 0.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Rapt - Rice Adaptive Particle Tracer</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/particle.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-rapt.Particle">
+<span id="particle"></span><h1>Particle<a class="headerlink" href="#module-rapt.Particle" title="Permalink to this headline">¶</a></h1>
+<p>Particle class definition</p>
+<dl class="docutils">
+<dt>AUTHOR:</dt>
+<dd><p class="first">Kaan Ozturk &lt;<a class="reference external" href="mailto:mkozturk&#37;&#52;&#48;yahoo&#46;com">mkozturk<span>&#64;</span>yahoo<span>&#46;</span>com</a>&gt;</p>
+<p class="last">2016, Rice University</p>
+</dd>
+</dl>
+<dl class="class">
+<dt id="rapt.Particle.Particle">
+<em class="property">class </em><code class="descclassname">rapt.Particle.</code><code class="descname">Particle</code><span class="sig-paren">(</span><em>pos=[]</em>, <em>vel=[]</em>, <em>t0=0</em>, <em>mass=None</em>, <em>charge=None</em>, <em>field=None</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>A classical particle (i.e., nonquantum, but relativistic), such as an electron or a proton,
+moving under the influence of given electric and magnetic fields.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pos: list or array</strong></p>
+<blockquote>
+<div><p>The initial position (x,y,z) of the particle, in meters.</p>
+</div></blockquote>
+<p><strong>vel: list or array</strong></p>
+<blockquote>
+<div><p>The initial velocity (vx, vy, vz) of the particle, in m/s.</p>
+</div></blockquote>
+<p><strong>t0: float</strong></p>
+<blockquote>
+<div><p>The time of simulation at the beginning (seconds), ignored for fields that do not depend on time.</p>
+</div></blockquote>
+<p><strong>mass: float</strong></p>
+<blockquote>
+<div><p>The mass of the particle, in kg.</p>
+</div></blockquote>
+<p><strong>charge: float</strong></p>
+<blockquote>
+<div><p>The charge of the particle, in Coulombs.</p>
+</div></blockquote>
+<p><strong>field: Field object</strong></p>
+<blockquote class="last">
+<div><p>The field object that provides electric and magnetic field vectors and related quantities.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="guidingcenter.html#module-rapt.GuidingCenter" title="rapt.GuidingCenter"><code class="xref py py-obj docutils literal"><span class="pre">rapt.GuidingCenter</span></code></a>, <a class="reference internal" href="doc/source/rapt.html#module-rapt.Adaptive" title="rapt.Adaptive"><code class="xref py py-obj docutils literal"><span class="pre">rapt.Adaptive</span></code></a></p>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>tcur</td>
+<td>(float) The current time value (seconds), updated after every integration step.</td>
+</tr>
+<tr class="row-even"><td>trajectory</td>
+<td>(n-by-7 array) The trajectory array, each row in the form (t, x, y, z, px, py, pz).</td>
+</tr>
+<tr class="row-odd"><td>check_adiabaticity</td>
+<td>(bool) If True, checks for the adiabaticity condition after every integration step.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="rapt.Particle.Particle.advance">
+<code class="descname">advance</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.advance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Advance the particle position and momentum for a given duration.</p>
+<p>The trajectory is initialized at the latest state of the particle and 
+integrated for an additional <cite>delta</cite> seconds. Uses the <cite>scipy.integrate.ode</cite>
+class with <cite>&#8220;dop853&#8221;</cite> solver.</p>
+<p>This method can be called many times.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>delta</strong> : float</p>
+<blockquote>
+<div><p>The number of seconds to advance the trajectory.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>Adiabatic</strong></p>
+<blockquote class="last">
+<div><p>Only if the <cite>check_adiabaticity</cite> attribute is set to True.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The particle is subject to the Newton-Lorentz equation of motion.</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}\begin{split}\frac{\mathrm{d}\vec{x}}{\mathrm{d}t} = \frac{\vec{p}}{\gamma m} \\\end{split}\\\frac{\mathrm{d}\vec{p}}{\mathrm{d}t} = q\vec{E} + q\vec{v}\times\vec{B}\end{aligned}\end{align} \]</div>
+<p>where <span class="math">\(\gamma = \sqrt{1 + (|\vec{p}|/mc)^2}\)</span> is the relativistic factor.</p>
+<p>The explicit runge-kutta method of order 8(5,3) due to Dormand &amp; Prince
+with stepsize control is used to solve for the motion. The relative 
+tolerance <cite>rtol</cite> and the absolute tolerance <cite>atol</cite> of the solver can be
+set with: <cite>rapt.params[&#8220;solvertolerances&#8221;] = (rtol, atol)</cite></p>
+<p>The <cite>beta</cite> parameter to the <cite>scipy.integrate.ode.setintegrator</cite> method
+serves to stabilize the solution in gridded fields.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rapt.Particle.Particle.check_adiabaticity">
+<code class="descname">check_adiabaticity</code><em class="property"> = None</em><a class="headerlink" href="#rapt.Particle.Particle.check_adiabaticity" title="Permalink to this definition">¶</a></dt>
+<dd><p>If True, checks for the adiabaticity condition after every integration step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.cycper">
+<code class="descname">cycper</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.cycper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cyclotron period value at the final position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.cycrad">
+<code class="descname">cycrad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.cycrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cyclotron radius value at the final position.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getB">
+<code class="descname">getB</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of total magnetic field strength values along the 
+trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getgamma">
+<code class="descname">getgamma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getgamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of relativistic factor values along the trajectory.</p>
+<p>The relativistic factor is defined as <span class="math">\(\gamma = \sqrt{1 + (p/mc)^2}\)</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getke">
+<code class="descname">getke</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of kinetic energy values (Joule) along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getp">
+<code class="descname">getp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of total momentum values along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getphi">
+<code class="descname">getphi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getphi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of polar angle coordinate (radians) along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getpx">
+<code class="descname">getpx</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getpx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the x-component of the momentum along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getpy">
+<code class="descname">getpy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the y-component of the momentum along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getpz">
+<code class="descname">getpz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getpz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the z-component of the momentum along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getr">
+<code class="descname">getr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of radial distance along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.gett">
+<code class="descname">gett</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.gett" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of time values along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.gettheta">
+<code class="descname">gettheta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.gettheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of azimuthal angle coordinate (radians) along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getv">
+<code class="descname">getv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the particle speed along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getvx">
+<code class="descname">getvx</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getvx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the x-component of the velocity along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getvy">
+<code class="descname">getvy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getvy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the y-component of the velocity along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getvz">
+<code class="descname">getvz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getvz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the z-component of the velocity along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getx">
+<code class="descname">getx</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of x-coordinate values along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.gety">
+<code class="descname">gety</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.gety" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of y-coordinate values along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.getz">
+<code class="descname">getz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.getz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of z-coordinate values along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.guidingcenter">
+<code class="descname">guidingcenter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.guidingcenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 2-d array of guiding center positions corresponding to particle positions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.init">
+<code class="descname">init</code><span class="sig-paren">(</span><em>p</em>, <em>gyrophase=0</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a Particle using the state of another Particle or GuidingCenter object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>p</strong> : Particle or GuidingCenter object.</p>
+<blockquote>
+<div><p>The object that is used to initialize the current Particle.</p>
+</div></blockquote>
+<p><strong>gyrophase</strong> : float, optional.</p>
+<blockquote class="last">
+<div><p>The phase angle of the gyromotion, if initializing with a GuidingCenter.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="doc/source/rapt.html#rapt.utils.GCtoFP" title="rapt.utils.GCtoFP"><code class="xref py py-obj docutils literal"><span class="pre">rapt.utils.GCtoFP</span></code></a></p>
+</div>
+<p class="rubric">Notes</p>
+<p>Takes the last state (position and momentum) of the given <cite>Particle</cite>
+or <cite>GuidingCenter</cite>, sets the initial conditions of self to match them,
+and runs <cite>__init__</cite> again. Therefore, all existing data is erased.</p>
+<p>Initialization from a <cite>GuidingCenter</cite> involves adding the gyroradius vector
+to the position. This process introduces an arbitrariness in the phase angle.
+This arbitrariness cannot be avoided because it is inherent in the definition
+of the guiding center. The optional <cite>gyrophase</cite> parameter allows the user to 
+set it to different values, e.g. to produce an ensemble of particles.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.isadiabatic">
+<code class="descname">isadiabatic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.isadiabatic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the particle motion is adiabatic at the current location.</p>
+<p>The adiabaticity condition is defined as</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}\rho_c / L &lt; \epsilon_s\\\tau_c / T &lt; \epsilon_t\end{aligned}\end{align} \]</div>
+<p>where <span class="math">\(\rho_c\)</span> is the cyclotron radius, <span class="math">\(\tau_c\)</span> is the 
+cyclotron period, L is the field length scale, T is the field time scale,
+and <span class="math">\(\epsilon_s, \epsilon_t\)</span> are user-supplied thresholds for adiabaticity.
+The length scales are provided by the field object, and threshold 
+parameters set with <cite>rapt.params[&#8220;epss&#8221;]</cite> and <cite>rapt.params[&#8220;epst&#8221;]</cite>, 
+respectively.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bool</p>
+<blockquote>
+<div><p>True if the particle&#8217;s motion satisfies the adiabaticity conditions</p>
+</div></blockquote>
+<p class="last">at the present location, False otherwise.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the object from disk.</p>
+<p>Uses the built-in pickle module. All existing Particle data is replaced
+with the stored data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote class="last">
+<div><p>The name of the file where the object is stored.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.mu">
+<code class="descname">mu</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.mu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a 1-d array of the magnetic moment values along the trajectory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the object on disk.</p>
+<p>Uses the built-in pickle module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote class="last">
+<div><p>The name of the file to store. If file exists, it will be overwritten.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.setke">
+<code class="descname">setke</code><span class="sig-paren">(</span><em>ke</em>, <em>unit='ev'</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.setke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale the velocity vector with the speed corresponding to the given kinetic energy.
+Reinitializes the object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ke</strong> : float</p>
+<blockquote>
+<div><p>The kinetic energy of the particle (eV by default). Can be relativistic.</p>
+</div></blockquote>
+<p><strong>unit</strong> : str, optional</p>
+<blockquote class="last">
+<div><p>The unit of the energy. If &#8220;ev&#8221;, electron volts, otherwise Joule.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="rapt.Particle.Particle.setpa">
+<code class="descname">setpa</code><span class="sig-paren">(</span><em>pa</em><span class="sig-paren">)</span><a class="headerlink" href="#rapt.Particle.Particle.setpa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reinitialize the object with the given pitch angle (in degrees).</p>
+<p>Modifies the velocity vector while keeping the energy constant so that
+the particle&#8217;s pitch angle (angle between the velocity and magnetic field
+vectors) is <cite>pa</cite> degrees. Runs the <cite>__init__</cite> method, so any existing data
+will be lost.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pa</strong> : float</p>
+<blockquote class="last">
+<div><p>The new pitch angle in degrees.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rapt.Particle.Particle.tcur">
+<code class="descname">tcur</code><em class="property"> = None</em><a class="headerlink" href="#rapt.Particle.Particle.tcur" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current time value (seconds), updated after every integration step.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rapt.Particle.Particle.trajectory">
+<code class="descname">trajectory</code><em class="property"> = None</em><a class="headerlink" href="#rapt.Particle.Particle.trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>The trajectory array, each row in the form (t, x, y, z, px, py, pz).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Rapt - Rice Adaptive Particle Tracer"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rapt 0.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Kaan Ozturk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.1.
+    </div>
+  </body>
+</html>
