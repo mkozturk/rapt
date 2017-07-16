@@ -9,7 +9,7 @@ AUTHOR:
 """
 import numpy as np
 from scipy.integrate import ode
-
+import pickle
 import rapt.utils as ru
 from rapt import c, params
 from rapt.flutils import halfbouncepath, bounceperiod, gradI
@@ -249,7 +249,43 @@ class BounceCenter:
             nextpt = np.hstack(([t],r.integrate(r.t+dt)))
             self.trajectory = np.vstack((self.trajectory,nextpt))
         self.tcur = self.trajectory[-1,0]
+
+	def save(self,filename):
+        """
+        Save the object on disk.
         
+        Uses the built-in pickle module.
+        
+        Parameters
+        ----------
+        filename : str
+            The name of the file to store. If file exists, it will be overwritten.
+        """
+        f = open(filename,"wb")
+        pickle.dump(self,f)
+        f.close()
+    
+    def load(self,filename):
+        """
+        Load the object from disk.
+        
+        Uses the built-in pickle module. All existing data is replaced
+        with the stored data.
+        
+        Parameters
+        ----------
+        filename : str
+            The name of the file where the object is stored. 
+        
+        """
+
+        f = open(filename, "rb")
+        p = pickle.load(f)
+        f.close()
+        for k in p.__dict__.keys():
+            self.__dict__[k] = p.__dict__[k]
+
+
     def gett(self):
         """Return a 1-d array of time values along the trajectory."""
         return self.trajectory[:,0]
