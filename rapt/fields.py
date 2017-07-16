@@ -316,41 +316,6 @@ class EarthDipole(_Field):
         r2 = x*x+y*y+z*z
         return self._coeff / pow(r2, 2.5) * np.array([x*z, y*z, (z*z-r2/3)])
 
-# The following two functions have problem importing libdip.so. Commented out until fixed.
-
-#class EarthDipoleC(_Field):
-#    import ctypes
-#    _dip = ctypes.CDLL("libdip.so")
-#    _dip.dipole.argtypes = [ctypes.c_double,
-#                            ctypes.c_double,
-#                            ctypes.c_double,
-#                            ctypes.POINTER(ctypes.c_double)]
-#    _dip.dipole.restype = None
-#    def B(self,tpos):
-#        res = (self.ctypes.c_double * 3)()
-#        t,x,y,z = tpos
-#        self._dip.dipole(x/Re,y/Re,z/Re,res)
-#        return -B0*np.array(res)
-# 
-#class DoubleDipoleC(_Field):
-#    import ctypes
-#    _dip = ctypes.CDLL("libdip.so")
-#    _dip.doubledipole.argtypes = [ctypes.c_double,
-#                                  ctypes.c_double,
-#                                  ctypes.c_double,
-#                                  ctypes.POINTER(ctypes.c_double)]
-#    _dip.doubledipole.restype = None
-#    def __init__(self, standoff=10*Re, imagestrength=1):
-#        _Field.__init__(self)
-#        self.gradientstepsize = Re/1000
-#        self.dd = 2*standoff  # distance between two dipoles
-#        self.k = imagestrength   # >=1. Relative strength of the image dipole.
-#    def B(self, tpos):
-#        res = (self.ctypes.c_double * 3)()
-#        t,x,y,z = tpos
-#        self._dip.doubledipole(x/Re,y/Re,z/Re,res)
-#        return -B0*np.array(res)
-
 class DoubleDipole(_Field):
     """
     Field of two Earth dipoles with parallel magnetic moments.
