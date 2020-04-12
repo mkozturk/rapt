@@ -14,7 +14,7 @@ Features:
 * Utilites to evaluate particle-related or field-line related quantities.
 * Modular, object-oriented design for easy maintenance and extension.
 
-# # Requirements
+## Requirements
 * numpy>=1.17
 * scipy>=1.3.1
 
