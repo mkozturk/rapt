@@ -4,7 +4,7 @@ with open("README.md","r") as fh:
 
 setuptools.setup(
 	name="rapt",
-	version="0.0.1",
+	version="0.1.0",
 	author="Kaan Öztürk",
 	author_email="mkaanozturk@gmail.com",
 	description="Rice Adaptive Particle Tracer",

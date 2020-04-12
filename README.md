@@ -11,8 +11,10 @@ Features:
 * Support for time-dependent fields.
 * Extensible with user-defined field models.
 * Magnetic field-line tracing.
-* Utilites to evaluate particle-related or field-line related quantities.
+* Utilities to evaluate particle-related or field-line related quantities.
 * Modular, object-oriented design for easy maintenance and extension.
+
+This version is not stable and it is subject to change in future. 
 
 ## Requirements
 * numpy>=1.17
