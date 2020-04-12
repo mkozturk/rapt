@@ -249,8 +249,8 @@ class BounceCenter:
             nextpt = np.hstack(([t],r.integrate(r.t+dt)))
             self.trajectory = np.vstack((self.trajectory,nextpt))
         self.tcur = self.trajectory[-1,0]
-
-	def save(self,filename):
+        
+    def save(self,filename):
         """
         Save the object on disk.
         

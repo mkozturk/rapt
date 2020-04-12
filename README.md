@@ -22,6 +22,10 @@ This version is not stable and it is subject to change in future.
 
 ## Installation
 
+The package can be installed using `pip` with the following command
+
+```pip install git+https://github.com/mkozturk/rapt@master```
+
 ## Examples
 ### Proton trajectory around the Earth dipole
 ```from numpy import sin, cos, pi
