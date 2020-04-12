@@ -70,8 +70,6 @@ pl.show()
 
 * [Speiser orbits](https://github.com/mkozturk/rapt/blob/master/examples/Adaptive%20Example%20-%20Speiser%20orbits.ipynb): Illustrates the usage of the `Adaptive` class.
 
-* [Drift-shell splitting: Bounce-averaged proton orbits](https://github.com/mkozturk/rapt/blob/master/examples/BounceCenter%20example%20-%20Drift-shell%20splitting.ipynb). Illustrates the usage of `BounceCenter` class.
-
 * [Plotting field lines](https://github.com/mkozturk/rapt/blob/master/examples/Field%20line%20example.ipynb). How to visualize field lines in a given field model; plotting the field strength along a field line; getting the critical points (optima of field strength) on the field line. Illustrates the `Fieldline` class.
 
 * [Creating new analytic field models](https://github.com/mkozturk/rapt/blob/master/examples/Creating%20new%20fields.ipynb) Illustrates generating new field models where the electric and magnetic fields have explicit mathematical formulas.
