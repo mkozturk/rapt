@@ -1,3 +1,5 @@
+[![Binder](http://mybinder.org/badge_logo.svg)](http://beta.mybinder.org/v2/gh/mkozturk/kave_exercise/master)
+
 # RAPT: A Python framework for tracing relativistic test particles in general electromagnetic fields
 
 RAPT (Rice Adaptive Particle Tracer) is an object-oriented package for simulating trajectories of charged particles under electric and magnetic fields. It is intended to be used for plasma physics research and education.
