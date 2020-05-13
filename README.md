@@ -1,4 +1,4 @@
-[![Binder](http://mybinder.org/badge_logo.svg)](http://beta.mybinder.org/v2/gh/mkozturk/kave_exercise/master)
+[![Binder](http://mybinder.org/badge_logo.svg)](http://beta.mybinder.org/v2/gh/mkozturk/rapt/master)
 
 # RAPT: A Python framework for tracing relativistic test particles in general electromagnetic fields
 
