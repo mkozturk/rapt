@@ -15,7 +15,7 @@ from rapt.fieldline import Fieldline
 
 from scipy.interpolate import interp1d
 from scipy.optimize import brentq, minimize
-from scipy.integrate import quad,simps
+from scipy.integrate import quad,simpson
 from scipy.misc import derivative
 
 def criticalpoints(tpos, field, Bm):
